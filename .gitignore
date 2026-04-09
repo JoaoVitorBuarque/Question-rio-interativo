@@ -1,0 +1,11 @@
+*.pdf
+*.PDF
+*.docx
+*.txt
+*.py
+tmp_*
+pdf_temp_*
+PROFESSOR_CONFIG.md
+# Keep the deploy folder and the main html
+!questionario_interativo.html
+!deploy/

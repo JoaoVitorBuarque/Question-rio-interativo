@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Questionário – Estudo do Ser Humano Contemporâneo</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0f1117;--surf:#1a1d27;--card:#1e2133;--brd:#2a2f45;--pri:#6c63ff;--pril:#8b83ff;--pglow:rgba(108,99,255,.22);--ok:#22c55e;--okl:rgba(34,197,94,.14);--err:#ef4444;--errl:rgba(239,68,68,.14);--txt:#e8eaf0;--mute:#7c82a0;--dim:#4a4f6a;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 20% 15%,rgba(108,99,255,.1) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 80% 85%,rgba(245,158,11,.06) 0%,transparent 60%);pointer-events:none;z-index:0;}
+.wrap{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:0 18px 70px;}
+header{text-align:center;padding:48px 0 28px;}
+.badge{display:inline-block;background:var(--pglow);border:1px solid var(--pri);color:var(--pril);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:5px 14px;border-radius:50px;margin-bottom:16px;}
+h1{font-size:clamp(24px,5vw,40px);font-weight:800;background:linear-gradient(135deg,#fff 30%,var(--pril));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2;margin-bottom:8px;}
+header p{color:var(--mute);font-size:14px;}
+.pbar{background:var(--surf);border:1px solid var(--brd);border-radius:14px;padding:14px 22px;margin-bottom:24px;display:flex;align-items:center;gap:14px;}
+.plabel,.pcount{font-size:13px;color:var(--mute);white-space:nowrap;}
+.ptrack{flex:1;height:7px;background:var(--brd);border-radius:999px;overflow:hidden;}
+.pfill{height:100%;background:linear-gradient(90deg,var(--pri),var(--pril));border-radius:999px;transition:width .5s cubic-bezier(.4,0,.2,1);}
+.pills{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;}
+.pill{display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:10px;font-size:13px;font-weight:600;border:1px solid;}
+.pc{background:var(--okl);border-color:var(--ok);color:var(--ok);}
+.pw{background:var(--errl);border-color:var(--err);color:var(--err);}
+.pr{background:rgba(124,130,160,.1);border-color:var(--brd);color:var(--mute);}
+.filters{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;}
+.fbt{padding:8px 18px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;border:1.5px solid var(--brd);background:var(--surf);color:var(--mute);transition:all .2s;}
+.fbt:hover,.fbt.on{border-color:var(--pri);color:var(--pril);background:var(--pglow);}
+.qcard{background:var(--card);border:1px solid var(--brd);border-radius:18px;padding:28px;margin-bottom:22px;position:relative;overflow:hidden;transition:border-color .3s;}
+.qcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--pri),var(--pril));}
+.qcard.ok{border-color:var(--ok);}.qcard.ok::before{background:var(--ok);}
+.qcard.er{border-color:var(--err);}.qcard.er::before{background:var(--err);}
+.qmeta{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.qnum{background:var(--pglow);border:1px solid var(--pri);color:var(--pril);font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;}
+.qtopic{font-size:11px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+.ctx{background:var(--surf);border-left:3px solid var(--pri);border-radius:0 10px 10px 0;padding:13px 16px;margin-bottom:16px;font-size:13.5px;line-height:1.7;color:var(--mute);}
+.qtext{font-size:15.5px;font-weight:500;line-height:1.65;color:var(--txt);margin-bottom:20px;}
+.opts{display:flex;flex-direction:column;gap:9px;}
+.opt{display:flex;align-items:flex-start;gap:13px;padding:13px 17px;background:var(--surf);border:1.5px solid var(--brd);border-radius:11px;cursor:pointer;text-align:left;font-family:'Inter',sans-serif;font-size:14px;color:var(--txt);line-height:1.5;transition:all .2s;}
+.opt:hover:not(:disabled){border-color:var(--pri);background:rgba(108,99,255,.08);transform:translateX(3px);}
+.opt:disabled{cursor:default;}
+.lt{min-width:26px;height:26px;border-radius:7px;background:var(--brd);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--mute);flex-shrink:0;margin-top:1px;transition:all .2s;}
+.opt.correct{border-color:var(--ok);background:var(--okl);animation:pulse .5s ease;}
+.opt.correct .lt{background:var(--ok);color:#fff;}
+.opt.wrong{border-color:var(--err);background:var(--errl);animation:shake .4s ease;}
+.opt.wrong .lt{background:var(--err);color:#fff;}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.015)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.fb{display:none;align-items:center;gap:9px;padding:12px 15px;border-radius:10px;font-size:14px;font-weight:600;margin-top:13px;}
+.fb.show{display:flex;animation:fadeup .35s ease;}
+.fb.correct{background:var(--okl);color:var(--ok);border:1px solid var(--ok);}
+.fb.wrong{background:var(--errl);color:var(--err);border:1px solid var(--err);}
+@keyframes fadeup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+#result{display:none;text-align:center;padding:48px 28px;background:var(--card);border:1px solid var(--brd);border-radius:22px;margin-top:20px;}
+.remoji{font-size:68px;margin-bottom:14px;}
+.rtitle{font-size:30px;font-weight:800;background:linear-gradient(135deg,#fff,var(--pril));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;}
+.rpct{font-size:54px;font-weight:800;margin:0 0 20px;}
+.rsub{font-size:15px;color:var(--mute);margin-bottom:28px;}
+.rstats{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-bottom:32px;}
+.rstat{padding:18px 26px;border-radius:14px;border:1px solid;min-width:110px;}
+.rstat.sc{background:var(--okl);border-color:var(--ok);}.rstat.sc .rn{color:var(--ok);}
+.rstat.sw{background:var(--errl);border-color:var(--err);}.rstat.sw .rn{color:var(--err);}
+.rstat.st{background:rgba(108,99,255,.1);border-color:var(--pri);}.rstat.st .rn{color:var(--pril);}
+.rn{font-size:34px;font-weight:800;margin-bottom:4px;}
+.rl{font-size:11px;color:var(--mute);font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+.btnr{display:inline-flex;align-items:center;gap:8px;padding:14px 30px;background:linear-gradient(135deg,var(--pri),var(--pril));color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;box-shadow:0 4px 20px var(--pglow);transition:transform .2s,box-shadow .2s;}
+.btnr:hover{transform:translateY(-2px);box-shadow:0 8px 30px var(--pglow);}
+#fab{position:fixed;bottom:26px;right:26px;width:46px;height:46px;border-radius:50%;background:var(--pri);color:#fff;border:none;font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px var(--pglow);opacity:0;pointer-events:none;transition:opacity .3s,transform .2s;z-index:100;}
+#fab.vis{opacity:1;pointer-events:auto;}#fab:hover{transform:translateY(-3px);}
+@media(max-width:600px){.qcard{padding:20px 16px;}.rstats{flex-direction:column;align-items:center;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<div class="badge">📚 Estudo do Ser Humano Contemporâneo</div>
+<h1>Questionário Interativo Completo</h1>
+<p>Selecione uma alternativa para ver o resultado imediatamente · 40 questões</p>
+</header>
+
+<div class="pbar">
+<span class="plabel" id="pl">0 de 40 respondidas</span>
+<div class="ptrack"><div class="pfill" id="pf" style="width:0%"></div></div>
+<span class="pcount" id="pc">0%</span>
+</div>
+
+<div class="pills">
+<div class="pill pc">✅ <span id="sc">0</span> corretas</div>
+<div class="pill pw">❌ <span id="sw">0</span> erradas</div>
+<div class="pill pr">⏳ <span id="sr" data-total="40">40</span> restantes</div>
+</div>
+
+<div class="filters">
+<button class="fbt on" onclick="filter('all',this)">Todas</button>
+<button class="fbt" onclick="filter('un',this)">Não respondidas</button>
+<button class="fbt" onclick="filter('ok',this)">Corretas</button>
+<button class="fbt" onclick="filter('er',this)">Erradas</button>
+</div>
+
+<div id="ql"></div>
+<div id="result">
+<div class="remoji" id="re">🎉</div>
+<div class="rtitle">Questionário Concluído!</div>
+<div class="rpct" id="rp"></div>
+<div class="rsub" id="rs"></div>
+<div class="rstats">
+<div class="rstat sc"><div class="rn" id="rc">0</div><div class="rl">Corretas</div></div>
+<div class="rstat sw"><div class="rn" id="rw">0</div><div class="rl">Erradas</div></div>
+<div class="rstat st"><div class="rn" id="rt">40</div><div class="rl">Total</div></div>
+</div>
+<button class="btnr" onclick="restart()">🔄 Refazer Questionário</button>
+</div>
+</div>
+<button id="fab" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+const L=['A','B','C','D','E'];
+const Q=[
+// ── UNIDADE 1 ──────────────────────────────────────────────
+{n:1,tp:'Cultura – Papel na existência humana',
+ctx:'A palavra cultura é usada com diferentes significados (polissemia). No primeiro sentido, significa a formação do homem, sua melhora e refinamento. No segundo, indica o produto dessa formação, o conjunto de modos de pensar cultivados, que também costumam ser chamados de civilização.',
+q:'Sobre o papel da cultura na existência humana, leia as proposições:\n\nI. Estabelecer a diferença e a exclusão entre as identidades individuais.\nII. Criar sistemas classificatórios permeados por relações de poder.\nIII. Transformar a natureza e ressignificar a própria vida a partir do ser humano.\nIV. Revelar a diversidade e pluralidade dos seres e suas relações.\n\nÉ correto o que se afirma apenas em:',
+opts:['III e IV.','I e II.','II e IV.','I e IV.','II e III.'],ans:0},
+
+{n:2,tp:'Cultura – Homo Ludens / Lúdico',
+ctx:'O ser humano é um animal que joga com a realidade. Não se trata de mero detalhe sobre seu existir, mas uma dimensão na qual ele pode se expressar.',
+q:'Sobre o termo "lúdico", pode-se entender que ele é relativo a quê? Leia as proposições e atribua V ou F:\n\n( ) Jogos, brinquedos ou divertimento.\n( ) Qualquer atividade que distrai ou diverte.\n( ) Brincadeiras e divertimentos, como instrumento educativo.\n( ) Apenas atividades voltadas para crianças.\n\nA sequência correta de cima para baixo é:',
+opts:['V, V, V, F.','F, V, F, V.','V, V, F, F.','F, V, V, V.','V, F, V, F.'],ans:0},
+
+{n:3,tp:'Cultura – Trocas Culturais (Parabolicamará)',
+ctx:'"Antes mundo era pequeno / Porque terra era grande / Hoje mundo é muito grande / Porque terra é pequena / Do tamanho da antena parabolicamará / [...] Antes longe era distante / Perto, só quando dava / Quando muito, ali defronte / E o horizonte acabava / Hoje lá trás dos montes, den de casa, camará" (Gilberto Gil, Parabolicamará)',
+q:'Avalie as asserções a seguir e a relação proposta entre elas:\n\nI. As trocas culturais na atualidade não trazem benefícios.\n\nPORQUE\n\nII. Etnocentrismo e xenofobia são fenômenos muito antigos.\n\nA respeito dessas asserções, assinale a opção correta:',
+opts:['A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.','As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I.','As asserções I e II são proposições falsas.','As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.','A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.'],ans:0},
+
+{n:4,tp:'Cultura – Homo Ludens: Jogo e Culto (Huizinga)',
+ctx:'HUIZINGA, Johan. Homo ludens. 4 ed. São Paulo: Perspectiva, 1999.\n"[...] na sociedade primitiva, verifica-se a presença do jogo, tal como nas crianças e nos animais, e que, desde a origem, nele se verificam todas as características lúdicas: ordem, tensão, movimento, mudança, solenidade, ritmo, entusiasmo. [...] O culto é a forma mais alta e mais sagrada da seriedade. Como pode ele, apesar disso, ser jogo?"',
+q:'De acordo com o próprio texto, pode se afirmar que:\n\nI. Devido à seriedade, solenidade e sacralidade, que lhe são próprias, o culto não pode ser considerado uma forma de jogo.\n\nPORQUE\n\nII. O culto, isto é, a expressão religiosa, conserva os elementos essenciais do jogo, a saber: ordem, tensão, movimento, mudança, solenidade, ritmo, entusiasmo.\n\nA respeito dessas asserções, assinale a opção correta:',
+opts:['A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.','A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.','As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I.','As asserções I e II são proposições falsas.','As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.'],ans:0},
+
+{n:5,tp:'Cultura – Dimensão Simbólica',
+ctx:'"[...] temos um debate crescente acerca da constituição dos seres humanos como seres que são culturais. Portanto, não podendo ser definidos e delimitados apenas pelo código que a molécula de DNA e sua leitura nos possibilita. A cultura seria, nesse debate, constitutiva da nossa espécie. Cultura pode ser definida como práticas sociais, que têm significado no tempo e no espaço, na história."',
+q:'A partir do que foi estudado, o que faz da cultura um traço tipicamente humano?',
+opts:['A sua transmissão genética.','A sua relação com a natureza.','A sua dimensão simbólica.','A sua capacidade de adaptação.','A sua interdependência com outros grupos.'],ans:2},
+
+// ── UNIDADE 2 ──────────────────────────────────────────────
+{n:6,tp:'Linguagem, Sociedade e Política',
+ctx:'A capacidade humana de comunicação sofisticada (Homo loquens) é um pilar essencial para a organização social (Homo socialis) e o exercício da política em uma perspectiva democrática (Homo politicus). A linguagem permite a articulação de ideias complexas, a negociação de interesses e a construção de um entendimento comum.',
+q:'Com base na relação entre linguagem, sociedade e política, avalie as afirmações como (V) Verdadeiras ou (F) Falsas:\n\nI. A linguagem é uma ferramenta neutra, cujo uso não afeta a forma como as relações sociais se estruturam ou o modo como a política democrática é praticada.\n\nII. O desenvolvimento da linguagem escrita e a difusão da informação contribuíram para a expansão da esfera pública, permitindo que a política se tornasse menos dependente do contato físico.\n\nIII. Em uma democracia, a capacidade de negociar, persuadir e construir consensos é diretamente ligada à dimensão do Homo loquens.\n\nIV. A manipulação da linguagem, como a proliferação de desinformação, afeta a dimensão do Homo socialis ao minar a confiança e a coesão social.\n\nAssinale a alternativa que apresenta a sequência correta de V e F:',
+opts:['V – F – F – V','F – V – V – F','F – V – V – V','V – F – V – F','F – V – F – F'],ans:2},
+
+// ── UNIDADE 1 (QUINZENA 1 PDF) ──────────────────────────────
+{n:7,tp:'Ser Humano – Cooperação e Sobrevivência',
+ctx:'"O conceito de cooperação é essencial para a sociologia, na medida em que a cooperação é uma forma de interação social, na qual os indivíduos se empenham na obtenção de um fim coletivo e comum, sendo assim imprescindível na constituição da maioria dos grupos sociais."',
+q:'Mesmo sendo mais fraco e com desenvolvimento físico inferior ao de outros animais, pode-se dizer que a humanidade sobreviveu e se organizou pois:',
+opts:['Desenvolveu meios de dominar os perigos que os outros animais representavam, utilizando-os, principalmente, como alimento.','Entendeu que cada indivíduo deve cuidar de suas próprias necessidades para que o coletivo se realize.','Soube se organizar em torno de indivíduos que mostrassem maior poder e influência dentro do grupo, estabelecendo regras sociais.','Abandonou indivíduos que fossem mais fracos, respondendo ao processo de seleção natural.','Percebeu que era necessário um ideal de vida que fosse coletivo, a partir do qual todo indivíduo pudesse colaborar para além de sua própria realização.'],ans:4},
+
+{n:8,tp:'Ser Humano – Determinismo e Liberdade da Vontade',
+ctx:'Em indivíduos nos quais ocorreu secção do corpo caloso [...] Sperry (1968) e colaboradores observaram impressionantes modificações do comportamento. [...] Por outro lado, o indivíduo pode estar genotipicamente condicionado para exibir um peculiar comportamento. Se o cromossomo 21 ocorrer em dose tripla ele exibirá a síndrome de Down [...]\n(MENDES, E. G.. Determinismo e liberdade da vontade: o enfoque biológico)',
+q:'Considerando os casos mencionados acima, avalie as asserções a seguir e a relação proposta entre elas:\n\nI. A ciência nega em determinados casos a liberdade da vontade humana.\n\nPORQUE\n\nII. As causas de determinadas condutas e de certos comportamentos, comumente atribuídos à liberdade da vontade, têm sido identificadas por meio da análise físico-química que se vem fazendo do comportamento animal, em geral, e do humano, em particular.\n\nA respeito dessas asserções, assinale a opção correta:',
+opts:['A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.','As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I.','As asserções I e II são proposições falsas.','A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.','As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.'],ans:1},
+
+{n:9,tp:'Ser Humano – Autoconhecimento (Sócrates)',
+ctx:'"Conhecer o ser humano é um desafio primário, no sentido de ser básico para o exercício de qualquer ofício, e um desafio último, no sentido existencial, de encontrar um propósito para a existência e para o exercício das atividades profissionais. A pergunta existencial mais importante, para o filósofo Sócrates era: Conhece-te a ti mesmo."',
+q:'Sobre a importância da busca pelo autoconhecimento, pode-se dizer que:',
+opts:['O autoconhecimento, por ser inalcançável, impossibilita o conhecimento da verdade sobre o mundo.','Conhecer a verdade sobre o mundo é a condição para o conhecimento de si mesmo.','O conhecimento da verdade sobre o mundo é inatingível, portanto, o que nos resta é a possibilidade do autoconhecimento.','O conhecimento de si deve ser buscado, independentemente do interesse pelo conhecimento da verdade sobre o mundo.','Buscar o conhecimento de si é uma condição necessária para se conhecer a verdade sobre o mundo.'],ans:4},
+
+{n:10,tp:'Ser Humano – Liberdade e Progresso',
+ctx:'"O problema hoje é: de que forma se pode ser ainda livres na sociedade atual, na qual os sistemas políticos, os instrumentos de comunicação, os produtos da tecnologia tornaram-se todos meios potentes de opressão? (...) O problema é encontrar a forma de conciliar o progresso com a liberdade."\n(MONDIN, B. O homem, quem é ele? São Paulo: Paulus, 1980)',
+q:'Avalie as asserções a seguir e a relação proposta entre elas:\n\nI. Na atualidade, pode-se dizer que a liberdade do ser humano é plena, ao se comparar com tempos anteriores.\n\nPORQUE\n\nII. Os frutos do progresso geraram uma situação de exploração e aprisionamento.\n\nA respeito dessas asserções, assinale a opção correta:',
+opts:['As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I.','A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.','A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.','As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.','As asserções I e II são proposições falsas.'],ans:1},
+
+{n:11,tp:'Ser Humano – Múltiplas Inteligências',
+ctx:'"Talvez você já tenha passado pela situação de não se sentir inteligente o suficiente, seja por não dominar uma disciplina ou não entender algum conceito. Mas com a teoria das múltiplas inteligências, o seu jeito de pensar sobre a sua própria inteligência vai mudar."',
+q:'Ao tratarmos do tema da inteligência, leia as proposições:\n\nI. Diferente de outras épocas, a contemporaneidade afirma que a inteligência deve ser mais que a simples resolução de problemas lógicos.\nII. Ser inteligente em uma sociedade depende de como é possível responder ao padrão estabelecido pelos mais inteligentes naquele meio.\nIII. Ao se assumir um único conceito de inteligência, perde-se muito da experiência humana, pois a complexidade do mundo pode ser mais bem pensada a partir de múltiplas inteligências.\nIV. Mesmo com o conceito de multiplicidade da inteligência humana, um indivíduo tem sempre um único tipo de inteligência.\nV. Só uma sociedade tem condições de definir se os indivíduos que a constituem são inteligentes, sem qualquer regra de definição.\n\nÉ correto o que se afirma apenas em:',
+opts:['I e II.','IV e V.','III e V.','I e III.','II e IV.'],ans:3},
+
+// ── QUINZENA 3 (Atividade 2 PDF) ────────────────────────────
+{n:12,tp:'Homo Ludens – Gamificação no Trabalho',
+ctx:'"O século XIX marca um período de profundas transformações [...] a racionalidade econômica não fica mais restrita apenas ao seu campo, mas invade outras dimensões e áreas como, por exemplo, a do lazer, do ócio, da diversão, espaços por excelência do lúdico. O que ocorre, então, quando o campo do lúdico é atravessado pelo espírito do negócio?"\n(BARROS, Carlos Juliano. Gamificação: como o trabalho vira uma jornada viciante e até perigosa. UOL, 2021)',
+q:'Com base no contexto profissional indicado no texto, avalie as asserções a seguir e a relação proposta entre elas:\n\nI. A gamificação no trabalho transforma todas as atividades laborais em jogos, eliminando completamente a seriedade e a produtividade.\n\nPORQUE\n\nII. A gamificação no trabalho utiliza elementos de jogos para aumentar o engajamento e a motivação dos trabalhadores, mas pode também criar um ambiente de competição excessiva e riscos à saúde mental.\n\nA respeito dessas asserções, assinale a opção correta:',
+opts:['A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.','A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.','As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I.','As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.','As asserções I e II são proposições falsas.'],ans:1},
+
+{n:13,tp:'Homo Ludens – Jogo como Fim em Si Mesmo (Mondin)',
+ctx:'"O jogo é atividade típica do homem. Ele distingue-se profundamente dos animais não apenas graças ao pensamento, à liberdade, à linguagem, ao trabalho, mas também graças ao jogo. O homem inventa jogos e diverte-se como nenhum animal sabe fazer. Por esse motivo, além de sapiens, volens, loquens, faber; ele pode ser oportunamente definido como ludens."\n(MONDIN, Battista. O homem, quem é ele? São Paulo: Paulus, 1980. p. 215-216)',
+q:'Avalie as asserções a seguir e a relação proposta entre elas:\n\nI. Pode-se, a rigor, afirmar que tudo, na cultura humana, se resume ao jogo, que se configura como meio para alcançar determinados objetivos, tais como, a saúde do corpo e da mente e até mesmo retornos financeiros.\n\nPORQUE\n\nII. Segundo o filósofo Huizinga, jogo é o desenvolvimento de atividades com vistas à distração, ao divertimento, à satisfação e à autorrealização, sendo fim de si mesmo e não meio para consecução de outros objetivos.\n\nA respeito dessas asserções, assinale a opção correta:',
+opts:['A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.','As asserções I e II são proposições falsas.','A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.','As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.','As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I.'],ans:0},
+
+{n:14,tp:'Homo Ludens – Cultura Lúdica',
+ctx:'"O conjunto das regras de jogo disponíveis para os participantes numa determinada sociedade compõe a cultura lúdica dessa sociedade e as regras que um indivíduo conhece compõem sua própria cultura lúdica."',
+q:'O jogo é considerado uma brecha na rigidez do cotidiano. Por quê?',
+opts:['É uma forma de entretenimento sem significado cultural.','Há um ritual sagrado praticado por sociedades primitivas.','É uma competição exclusivamente presente no campo jurídico.','É uma atividade fisiológica necessária para a sobrevivência.','Há um elemento lúdico oculto por trás dos fenômenos culturais.'],ans:4},
+
+{n:15,tp:'Violência Religiosa – Interpretações Distorcidas',
+ctx:'"Segundo o que foi estudado, atos de violência com motivação religiosa são justificados em que elementos? Leia as proposições:\n\nI. A violência é resultado de interpretações religiosas distorcidas e equivocadas.\nII. A violência é uma forma de expressão da fé religiosa.\nIII. A violência é causada apenas pelo fanatismo religioso.\nIV. A violência é uma resposta contrária ao que afirma a maioria das religiões.\nV. A violência religiosa é uma forma de punição divina."',
+q:'É correto o que se afirma apenas em:',
+opts:['I, III e V.','IV e V.','I, II e III.','II e V.','I e IV.'],ans:4},
+
+// ── QUINZENA 4 (PDFs / Imagens) ─────────────────────────────
+{n:16,tp:'Religião – Laudato Si\' e Ecologia Integral',
+ctx:'"Laudato Si\' é uma encíclica do Papa Francisco publicada em maio de 2015. Ela trata do cuidado com o meio ambiente e com todas as pessoas, bem como de questões mais amplas da relação entre Deus, os seres humanos e a Terra. O subtítulo da encíclica, \'Sobre o Cuidado da Casa Comum\', reforça esses temas-chave."',
+q:'Assinale a alternativa que traz um conceito base presente na encíclica cujo trecho foi apresentado.',
+opts:['Problemas habitacionais.','Consumo desenfreado.','Integração cultural.','Economia global.','Ecologia integral.'],ans:4},
+
+{n:17,tp:'Religião – Laudato Si\' e o Ecossistema',
+ctx:'"A encíclica Laudato Si, tem como um de seus principais objetivos o de levar o ser humano a entender que a vida humana se relaciona com a vida do planeta."',
+q:'O papel da inter-relação entre o ser humano e o ecossistema, de acordo com o que foi estudado, é:',
+opts:['Justificar a exploração dos recursos naturais pela humanidade.','Reforçar a ideia de que o ser humano é o único beneficiário da Casa Comum.','Promover uma postura ética baseada na harmonia e interdependência.','Estabelecer uma relação de predador entre o ser humano e o ecossistema.','Criar uma consciência de separação entre o ser humano e a Casa Comum.'],ans:2},
+
+{n:18,tp:'Ser Humano – Transcendência na Religião',
+ctx:'"Na expressão religiosa o ser humano encontra condições para se autotranscender, para ir além de si mesmo. Essa transcendência que a religião torna possível não está condicionada à crença num Outro transcendente, sugerida por diversas religiões; mesmo naquelas que não estão ligadas à noção de um sagrado transcendente a possibilidade de transcendência persiste, porque continua sendo possível que o ser humano se mova para além de si, na direção das outras pessoas."',
+q:'A partir do que foi estudado, o que é transcendência na religião?',
+opts:['A atitude de entender os seres celestes para além do plano físico.','A atitude de busca pela sobrevivência nas coisas mais simples do cotidiano.','A atitude de ir para além das questões mais diretamente ligadas aos limites do mundo dado.','A atitude de conhecer melhor uma divindade cultuada na religião.','A atitude de elaborar doutrinas e conhecimentos acessíveis apenas a iniciados.'],ans:2},
+
+{n:19,tp:'Ser Humano – Autotranscendência (Karl Popper)',
+ctx:'"Nós continuamente transcendemos a nós mesmos, aos nossos talentos e às nossas qualidades. Essa autotranscendência é o mais extraordinário e importante fato de toda a vida e de toda a evolução, e, especialmente, da evolução humana."\n(POPPER, K. Epistemologia, razionalità e libertà. Roma: Armando, 1972. p. 58)',
+q:'Segundo essa perspectiva, é correto afirmar que:',
+opts:['O ser humano suplanta continuamente o horizonte dos conhecimentos já adquiridos, mas nega a possibilidade da existência de fins mais altos.','O ser humano eventualmente suplanta o horizonte dos conhecimentos já adquiridos, pois sempre tende a lançar-se para fins materialistas.','O ser humano se adapta continuamente ao horizonte dos conhecimentos já adquiridos e resiste à busca de fins mais altos.','O ser humano suplanta continuamente o horizonte dos conhecimentos já adquiridos e se lança para fins sempre mais altos.','O ser humano raramente suplanta o horizonte dos conhecimentos já adquiridos e se lança para fins sempre mais limitados.'],ans:3},
+
+{n:20,tp:'Religião – Transcendência como Atitude (RAMOS et al.)',
+ctx:'"Mais que um transcendente, podemos entender que a religião traz consigo a capacidade de transcendência. [...] a transcendência é uma atitude e a religião tem o poder de levar seus fiéis a transcenderem as questões mais imanentes, e não porque elas sejam nocivas, mas porque o ser humano não se limita apenas à própria sobrevivência. O ser humano quer dar sentido, construir significados e olhar horizonte e perspectivas. A arte, o conhecimento e a religião têm a capacidade de se tornarem instrumentos de transcendência."\n(RAMOS et al. Estudo do Ser Humano Contemporâneo. USF, 2023. p. 106)',
+q:'A transcendência, segundo o texto, pode ser entendida como:',
+opts:['Uma capacidade exclusiva da religião, sem relação com a arte e o conhecimento.','Um conjunto de doutrinas e conhecimentos acessíveis aos iniciados.','Uma limitação à própria sobrevivência do ser humano.','Uma atitude que permite ao ser humano ir além dos limites da experiência comum e do mundo material.','Um objeto alcançado pelo fiel ao acreditar.'],ans:3},
+
+{n:21,tp:'Religião – Relação entre Religião e Transcendência',
+ctx:'"Mais que um transcendente, podemos entender que a religião traz consigo a capacidade de transcendência. [...] O ser humano quer dar sentido, construir significados e olhar horizonte e perspectivas. A arte, o conhecimento e a religião têm a capacidade de se tornarem instrumentos de transcendência."\n(RAMOS et al. Estudo do Ser Humano Contemporâneo. USF, 2023. p. 106)',
+q:'Com base no texto, qual das seguintes afirmações melhor descreve a relação entre religião e transcendência?',
+opts:['A transcendência é inacessível a não ser através da arte e do conhecimento.','A transcendência é um objeto ou um substantivo que o fiel alcança ao acreditar, isto é, por meio da fé.','A religião tem o poder de levar seus fiéis a transcenderem as questões mais imanentes, não porque elas sejam nocivas, mas porque o ser humano não se limita apenas à própria sobrevivência.','O ser humano não se limita apenas à própria sobrevivência, por essa razão busca dar sentidos à vida e construir significados por meio do que o texto se refere como "imanência".','A religião é um conjunto de doutrinas e conhecimentos acessíveis aos iniciados.'],ans:2},
+
+{n:22,tp:'Religião – Intolerância Religiosa (I, II, III, IV)',
+ctx:'"A violência com motivação religiosa tem aumentado, ao ponto que vemos fiéis e seus respectivos espaços e templos religiosos serem apedrejados e destruídos [...] Muitas práticas de violência são justificadas por interpretações religiosas distorcidas [...] É comum que símbolos religiosos sejam desrespeitados e as pessoas agredidas gratuitamente, apenas por professarem determinada fé. [...] Algumas concepções e comportamentos religiosos no nosso cotidiano e na nossa vida profissional podem suscitar contrariedades em nós mesmos ou nas pessoas à nossa volta."\n(RAMOS et al. Estudo do Ser Humano Contemporâneo. USF, 2023. p. 107-109)',
+q:'Com base nos textos, avalie as afirmações a seguir:\n\nI. Muitos atos de violência são justificados por meio de interpretações distorcidas das crenças que são professadas em tradições religiosas distintas.\nII. A violência com motivação religiosa está diminuindo, e as ocorrências de fiéis e templos religiosos sendo atacados têm se tornado cada vez mais raras.\nIII. Os atos de intolerância religiosa, manifestando-se como preconceito, discriminação, hostilidade e perseguição, têm aumentado tanto em forma de agressão verbal quanto física.\nIV. Certos símbolos religiosos podem provocar desconforto em nós ou nas pessoas ao nosso redor, a tal ponto que não é incomum que indivíduos sejam agredidos simplesmente por professarem uma fé específica.\n\nÉ correto somente o que se afirma em:',
+opts:['II, III e IV.','I, III e IV.','I e II.','I, II e III.','II e III.'],ans:1},
+
+{n:23,tp:'Religião – Fenômeno Cultural Complexo',
+ctx:'"A história das religiões é tão antiga quanto a história da sociedade, tornando-se difícil pensar no ser humano excluindo suas características, comportamentos e costumes religiosos. Além de ser um fenômeno tipicamente humano, visto que não encontramos religião nas outras espécies da natureza, as atividades religiosas não se limitam a um território, a um grupo específico ou mesmo a um momento histórico. A tradição religiosa brasileira é, fortemente, marcada por um reconhecimento do cristianismo como religião oficial."\n(RAMOS et al. Estudo do Ser Humano Contemporâneo. USF, 2023. p. 104)',
+q:'Considerando a perspectiva antropológica e filosófica sobre a dimensão religiosa do ser humano, assinale a alternativa correta:',
+opts:['A religião é uma dimensão da vida humana restrita ao âmbito privado, sem relevância para a esfera pública e política.','A religião é um fenômeno cultural complexo, que influencia costumes, comportamentos e identidades, sendo parte integrante da história e da diversidade das sociedades humanas.','A religião é uma forma de controle social utilizada por grupos dominantes para manipular e oprimir minorias religiosas.','A religião é um sistema de crenças e práticas exclusivas de grupos sociais específicos, sem relação com a cultura e a história das sociedades.','A religião é um conjunto de dogmas e rituais estabelecidos por autoridades religiosas, sem espaço para interpretações individuais ou adaptações culturais.'],ans:1},
+
+{n:24,tp:'Ser Humano – O Tempo e a Existência',
+ctx:'"És um senhor tão bonito / Quanto a cara do meu filho / Tempo, tempo, tempo, tempo / Vou te fazer um pedido / Tempo, tempo, tempo, tempo / Compositor de destinos / Tambor de todos os ritmos / Tempo, tempo, tempo, tempo / Entro em um acordo contigo / Tempo, tempo, tempo, tempo"\n(Caetano Veloso, Oração ao Tempo)',
+q:'De acordo com o que foi estudado, o tempo é um elemento fundamental para a projeção da vida do ser humano. Sobre o tema, leia as proposições:\n\nI. O tempo é uma ilusão e não afeta a existência humana.\nII. O tempo é dinâmico e impulsiona a vida dos indivíduos ao dinamismo.\nIII. O tempo delimita o existir humano, estabelecendo um início e um fim.\nIV. O tempo é irrelevante para a existência humana.\nV. O tempo é uma criação da mente humana.\n\nÉ correto o que se afirma apenas em:',
+opts:['II e III.','III e IV.','I, III e IV.','II e V.','I, III e V.'],ans:0},
+
+{n:25,tp:'Ser Humano – Constituição e Escolhas',
+ctx:'"O ser humano é uma unidade e uma totalidade. Portanto é inadequado se desenvolver doutrinas diversas sobre o ser humano: uma científica e uma filosófica, uma secular e uma religiosa, uma psicológica e uma sociológica. O ser humano é uma unidade indivisível."',
+q:'O ser humano, como um fenômeno dentro da existência, mostra-se como complexo, sendo e se fazendo dentro de determinadas possibilidades. Neste sentido, como o ser humano se constitui e se assume? Assinale a alternativa correta.',
+opts:['Por meio das áreas do conhecimento humanas, como filosofia e sociologia.','Por meio da reflexão detida sobre suas ações.','Através da influência dos estímulos do mundo circundante.','Com base na classificação de ser bom ou mau.','A partir das escolhas que faz ao longo de sua história.'],ans:4},
+
+{n:26,tp:'Mito e Ciência – Narrativas Distintas',
+ctx:'"Muitas vezes, mito e ciência são postos em lugares opostos quando o objetivo é pensar sobre a explicação humana sobre o mundo. É importante entender que ambos buscam explicar a origem – do mundo, da vida, do ser humano etc."',
+q:'Avalie as asserções a seguir e a relação proposta entre elas:\n\nI. Mito e ciência são narrativas, embora com fundamentação e desenvolvimento diversos.\n\nPORQUE\n\nII. Mito e ciência olham para o mundo a partir da mesma base racional.\n\nA respeito dessas asserções, assinale a opção correta:',
+opts:['As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I.','As asserções I e II são proposições falsas.','A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.','As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.','A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.'],ans:4},
+
+{n:27,tp:'Ser Humano – Agricultura Familiar e Sustentabilidade',
+ctx:'"No Brasil, a agricultura familiar ocupa uma extensão de área de 80,9 milhões de hectares, o que representa 23% da área total dos estabelecimentos agropecuários brasileiros. [...] a agricultura familiar empregava mais de 10 milhões de pessoas, o que corresponde a 67% do total de pessoas ocupadas na agropecuária, sendo responsável pela renda de 40% da população economicamente ativa."\n(EMBRAPA, 2017)',
+q:'Avalie as asserções a seguir e a relação proposta entre elas:\n\nI. A agricultura familiar ignora a inter-relação com o sistema econômico.\n\nPORQUE\n\nII. As ações relacionadas à agricultura familiar criam consciência sustentável.\n\nA respeito dessas asserções, assinale a opção correta:',
+opts:['As asserções I e II são proposições falsas.','As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.','A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.','A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.','As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I.'],ans:3},
+
+{n:28,tp:'Ser Humano – Comportamento Sustentável',
+ctx:'"Ter o comportamento de um consumidor sustentável significa considerar as consequências ecológicas e sociais para a tomada de decisão de compra. Isso implica tanto em optar por fornecedores e produtos verdes quanto em reduzir o consumo."',
+q:'Como o ser humano se convence da importância de um comportamento sustentável? Assinale a alternativa correta.',
+opts:['Através de pesquisas sobre sustentabilidade.','Através da compreensão do aquecimento global.','Através da adoção de práticas locais de integração.','Através da conscientização sobre a poluição.','Através do reconhecimento da interligação com o ecossistema.'],ans:4},
+
+{n:29,tp:'Homo Ludens – Definição de Jogo (Huizinga)',
+ctx:'"Huizinga é um dos grandes autores sobre o jogo. Em sua obra Homo ludens, ele apresenta uma definição de jogo que se tornou clássica na teoria dos jogos e na filosofia da cultura."',
+q:'Assinale a alternativa que apresenta a definição de Huizinga para o jogo.',
+opts:['Uma atividade com propósito sem muita definição.','Uma atividade que envolve apenas competição e interação.','Uma atividade que ocorre apenas nos momentos de ócio.','Uma atividade obrigatória com regras fixas.','Uma atividade voluntária com regras consentidas e um fim em si mesma.'],ans:4},
+
+{n:30,tp:'Temperatura Global e Meio Ambiente',
+ctx:'"Depois do junho mais quente registrado até agora no planeta, julho também começou em modo recorde. De acordo com os primeiros dados divulgados por várias organizações de observação, esta semana a marca da temperatura média diária na Terra já foi quebrada duas vezes. Na segunda-feira, atingiu 16,9 graus Celsius. Na terça-feira, ultrapassou os 17, explica Carlo Buontempo, diretor do Copernicus Climate Change Service, da União Europeia."',
+q:'Sobre a reportagem acima, leia as proposições:\n\nI. Os registros tão próximos no tempo são uma prova do aquecimento global que o ser humano desencadeou com seus gases de efeito estufa.\nII. A reportagem se refere à quebra de recorde da temperatura média diária na terra e aponta para o fato de não haver precedentes de temperaturas médias tão elevadas.\nIII. A temperatura média diária no planeta está diminuindo gradualmente desde 2016.\nIV. A imagem reproduzida na reportagem demonstra, por sua gradação cromática, que a temperatura dos oceanos está elevada, especialmente no Atlântico Norte.\n\nÉ correto o que se afirma apenas em:',
+opts:['I e III.','II e IV.','I e II.','III e IV.','I, II e III.'],ans:1},
+
+// ── ATIVIDADE 1 (questões extras) ────────────────────────────
+{n:31,tp:'Linguagem – Importância Social da Leitura',
+ctx:'A leitura torna a pessoa mais antenada, qualificada profissionalmente e atenta para o mundo e as coisas em geral, afirma Moacir Assunção, escritor e professor universitário especializado em ciências sociais. "Ela também permite entender melhor o mundo e aumenta bastante o seu capital intelectual. Em suma, a leitura é muito importante e fundamental para qualquer pessoa", diz.',
+q:'Sobre a importância social do ato de ler, assinale a alternativa correta.',
+opts:['Todas as pessoas que sabem ler têm acesso aos melhores postos de trabalho em uma sociedade.','Um melhor entendimento sobre o mundo vem mais de uma leitura da realidade do que da leitura de livros sobre a realidade.','A leitura é uma prática importante apenas para a área de humanidades, como, por exemplo, filosofia, história e pedagogia.','Saber ler traz uma solução automática para os problemas culturais em uma determinada sociedade.','Não basta saber ler – é preciso praticar a leitura, contribuindo para melhores condições de vida em sociedade.'],ans:4},
+
+{n:32,tp:'Ser Humano – Revolução Agrícola e Aldeias Neolíticas',
+ctx:'A transformação promovida pela revolução agrícola veio acompanhada da formação das primeiras aldeias neolíticas. Entre 8.000 e 6.000 a.C., esses agrupamentos humanos numerosos haviam se espalhado na região sul da Europa, no norte da África e no sudoeste da Ásia. Toda a região do chamado Crescente Fértil se transformou na principal localização de grupos que apresentavam formas mais complexas de orientar suas relações e práticas cotidianas.',
+q:'Sobre o desenvolvimento das sociedades humanas, assinale a alternativa correta.',
+opts:['As sociedades humanas sempre tiveram modos de organização muito simples, com poucas alterações até a atualidade.','As práticas de um grupo social são sempre estabelecidas por meio de um poder político sempre presente, desde a formação do grupo.','Conforme os grupos humanos deixaram de ser sedentários, a organização social foi se tornando mais simples.','A organização social é essencialmente humana, respondendo a uma crença em um ser divino que tudo criou e que deveria ter a vontade respeitada.','Ao longo do tempo, os humanos criaram modos de se organizar coletivamente que os separaram cada vez mais da vida natural.'],ans:4},
+
+{n:33,tp:'Ser Humano – Altruísmo, Empatia e Vida Coletiva',
+ctx:'Diversos estudos avaliaram todas as combinações possíveis de confronto entre a hipótese empatia-altruísmo e hipóteses egoístas alternativas, variando tanto qual ou quais metas egoístas poderiam ser mais facilmente alcançadas sem a necessidade de ajudar alguém, após a preocupação empática ter sido induzida e mantendo-se todas as outras variáveis e condições constantes, quanto variando o tipo de situação de ajuda e a técnica usada para induzir a preocupação empática, entre outras variáveis.',
+q:'Ao ser pensada a vida humana coletiva, pode-se dizer que',
+opts:['apenas ações altruístas têm condições de sustentar a sociedade, pois qualquer tipo de egoísmo leva à ruína de projetos coletivos.','toda ação com base no egoísmo do indivíduo traz consequências que nunca foram nem poderão ser boas para a sociedade, não importa qual tipo de avaliação seja feita.','a discussão entre os opostos altruísmo-egoísmo mostra que a reflexão sobre a ação humana é paradoxal e exige um questionamento não ingênuo sobre a ideia de \'bem\'.','a ação empática sempre leva à melhoria social, não sendo possível perpetuar diferenças sociais quando há empatia para com a dificuldade alheia.','os indivíduos devem ser motivados às boas ações sempre a partir de modelos que tenham o bom senso e a bondade humana como valores ideais.'],ans:2},
+
+// ── ATIVIDADE 3 – questões novas (não duplicadas) ────────────
+{n:34,tp:'Homo Ludens – Rousseau e o Estado de Natureza',
+ctx:'No estado de natureza, segundo Rousseau, os indivíduos viviam a partir de uma racionalidade primitiva, na utilização do espaço de modo comum, e na realização das atividades necessárias para a manutenção da vida individual, sem grandes conflitos, já que não havia propriedade privada.',
+q:'Qual das seguintes afirmações descreve corretamente o estado de natureza em Rousseau?',
+opts:['Um estado de total igualdade e liberdade entre os seres humanos.','Um estado de guerra permanente entre os seres humanos.','Um estado de harmonia e cooperação natural entre os seres humanos.','Um estado de obediência absoluta a um governante autoritário.','Um estado de caos e anarquia sem regras ou autoridade.'],ans:2},
+
+{n:35,tp:'Homo Ludens – Arte como Forma de Conhecimento',
+ctx:'A arte, como uma atividade estética, produz conhecimento, na medida em que nos conduz à experimentação dos sentidos e a alterações imprevistas em nosso ânimo, causando o surgimento de novas perspectivas sobre a vida e o mundo em que habitamos.',
+q:'Sobre a relação entre a arte e o conhecimento humano, leia as proposições.\n\nI. A arte é uma forma de conhecimento superior ao intelecto e é capaz de apreender a imprecisão e indeterminação da vida humana.\nII. A arte é uma forma de conhecimento lógico que nos permite ter consciência das coisas.\nIII. A arte é uma forma de conhecimento exclusiva das sociedades mais desenvolvidas, a partir da antiguidade clássica.\nIV. A arte está relacionada ao conhecimento humano, e é expressa por meio das necessidades individuais de cada artista em sua individualidade.\n\nÉ correto o que se afirma apenas em:',
+opts:['I e III.','I e IV.','II e III.','II e IV.','III e IV.'],ans:1},
+
+// ── QUESTÕES NOVAS (imagens) ──────────────────────────────────
+{n:36,tp:'Estudo do Ser Humano Contemporâneo – Essência Humana',
+ctx:'O fim último de todo esse envolvimento profissional, acima de tudo, está a preocupação com o nosso valor número um: a dignidade da vida humana, em particular, e a preservação da Vida, em geral. Neste sentido é que o componente Estudo do Ser Humano Contemporâneo pode ser entendido como aquele cujas temáticas perpassam tudo o que vier a ser problematizado nos demais. Os conhecimentos e as práticas relacionados a todo fazer humano depende de um entendimento do que seja a própria essência humana.\nRAMOS, Luiz Carlos; CRESPO, Luis Fernando; TOLEDO, Heloísa Maria dos Santos; MARCHINI, Welder Lancieri. Estudo do ser humano contemporâneo. Bragança Paulista: USF, 2023. p. 9 (Adap.)',
+q:'Em sintonia com a citação, avalie as asserções a seguir e a relação proposta entre elas.\n\nI. O componente "Estudo do Ser Humano Contemporâneo" em nosso envolvimento profissional tem como objetivo entender a essência humana e como ela se relaciona com todas as nossas ações e práticas.\n\nPORQUE\n\nII. A principal preocupação deste componente é contribuir para a preservação e a promoção da dignidade e da vida humana.\n\nA respeito dessas asserções, assinale a opção correta:',
+opts:['A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.','A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.','As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.','As asserções I e II são proposições falsas.','As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I.'],ans:4},
+
+{n:37,tp:'Múltiplas Inteligências – Conhecimento Científico',
+ctx:'O raciocínio lógico, que encontrou sua mais perfeita expressão no conhecimento científico, permitiu a nós, humanos, um desenvolvimento extraordinário. Trata-se do tipo de conhecimento mais confiável de que dispomos. A ciência nos ajuda a evitar equívocos e a superar muitos preconceitos. Mas temos que admitir que este não é o único tipo de conhecimento existente.\nUltimamente, tem-se tratado muito em múltiplas inteligências, tais como: inteligência linguística, lógico-matemática, espacial, corporal-cinestésica, interpessoal, intrapessoal, naturalística, musical.\nA perspectiva das múltiplas inteligências nos ajuda a ampliar nossa percepção do que significa "sapiens". E podemos levar em conta ainda outras formas de conhecimento que também têm sua legitimidade, tais como o senso comum, a fé, o conhecimento mitológico e até mesmo a própria intuição. Cada um tem seu lugar no nosso cotidiano. O que não podemos fazer é confundi-los e respeitar as regras e contextos de um em outro.\nRAMOS, Luiz Carlos; CRESPO, Luis Fernando; TOLEDO, Heloísa Maria dos Santos; MARCHINI, Welder Lancieri. Estudo do ser humano contemporâneo. Bragança Paulista: USF, 2023. p. 19-20.',
+q:'Com base no texto, avalie as asserções a seguir e a relação proposta entre elas.\n\nI. O conhecimento científico é o único tipo de conhecimento legítimo e confiável.\n\nPORQUE\n\nII. A perspectiva das múltiplas inteligências amplia nossa percepção do que significa ser humano e reconhece a legitimidade de outras formas de conhecimento, como o senso comum, a fé e a intuição.\n\nA respeito dessas asserções, assinale a opção correta:',
+opts:['As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.','As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I.','A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.','A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.','As asserções I e II são proposições falsas.'],ans:2},
+
+{n:38,tp:'Liberdade e Decisão – Saunders',
+ctx:'Antes de qualquer coisa, primeiramente é preciso se preparar para todo o trabalho de decidir. Para isso, Saunders recomenda três passos, que ela chama de pontos básicos: (1) marque um momento para decidir, (2) Defina a decisão (e o que ela engloba) e (3) Pense nas suas opções.\n\nDisponível em: https://www.napratica.org.br/taticas-para-tomar-decisoes-dificeis/, Acesso em: 25 jun. 2023.',
+q:'Avalie as asserções a seguir e a relação proposta entre elas.\n\nI. Decidir causa angústia.\n\nPORQUE\n\nII. A liberdade de escolha implica a responsabilidade sobre as consequências.\n\nA respeito dessas asserções, assinale a opção correta:',
+opts:['As asserções I e II são proposições falsas.','A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.','As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I.','As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.','A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.'],ans:2},
+
+{n:39,tp:'Contingência e Solidariedade – Iluminismo e Romantismo',
+ctx:'O indivíduo não é mais unicamente responsável por seus atos, mas, também, por aquilo que vive, por aquilo que é. A constatação, o homem é o que ele faz de si, pressupõe que este se inventa antes de realizar sua vida como seu projeto individual. Na verdade, encontramos as raízes da autoinvenção do indivíduo nas propostas por vezes contraditórias, por vezes entrelaçadas do iluminismo e do romantismo.\n\nDisponível em: https://periodicoseletronicos.ufma.br/index.php/revistahumus/article/download/1545/2804/14990, Acesso em: 01 jul. 2023.',
+q:'O ser humano se reinventa constantemente, pois sua existência é marcada pela contingência. A partir desta ideia, qual é a relação entre a contingência e a solidariedade? Leia as proposições.\n\nI. A contingência e a solidariedade são conceitos opostos e não possuem relação entre si.\n\nII. A contingência impede a solidariedade, pois gera incertezas e falta de compromisso.\n\nIII. A contingência é um obstáculo para a solidariedade, pois leva a agir a partir das incertezas.\n\nIV. A contingência propicia a solidariedade, pois cria a consciência da incerteza e a necessidade de apoio mútuo.\n\nÉ correto o que se afirma apenas em:',
+opts:['III.','II e III.','IV.','I.','II.'],ans:2},
+
+{n:40,tp:'Agenda 2030 – ODS e Desenvolvimento Sustentável',
+ctx:'A Agenda 2030 é um plano de ação para as pessoas, o planeta e a prosperidade, que busca fortalecer a paz universal. O plano indica 17 Objetivos de Desenvolvimento Sustentável, os ODS, e 169 metas, para erradicar a pobreza e promover vida digna para todos, dentro dos limites do planeta. São objetivos e metas claras, para que todos os países adotem com suas próprias prioridades e atuem no espírito de uma parceria global que orienta as escolhas necessárias para melhorar a vida das pessoas, agora e no futuro. [...]\n\n(A AGENDA 2030 para o Desenvolvimento Sustentável. Plataforma agenda 2030, [s. d.]. Disponível em: http://www.agenda2030.org.br/sobre/#:~:text=A%20Agenda%202030%C3%A9%20um,dentro%20dos%20limites%20do%20planeta. Acesso em: 16 abr. 2021.)',
+q:'Sobre a Agenda 2030, proposta pela ONU, é possível afirmar:',
+opts:['É uma agenda assumida por todos os países e nações do planeta.','São iniciativas claras e concretas a serem implementadas por meio de políticas locais.','O fato de delimitar a meta para 2030 enfraquece o projeto pois há países que não conseguem colocá-las em prática.','As orientações são balizadoras de políticas públicas, mas que encontram pouca receptividade no cenário global.','Trata de práticas globais e comuns a todos os povos.'],ans:1}
+];
+
+let ans=Array(Q.length).fill(null);
+
+function build(){
+  const el=document.getElementById('ql');el.innerHTML='';
+  Q.forEach((q,i)=>{
+    const c=document.createElement('div');
+    c.className='qcard';c.id='qc'+i;c.dataset.st='un';
+    const ctx=q.ctx?`<div class="ctx">${q.ctx.replace(/\n/g,'<br>')}</div>`:'';
+    const opts=q.opts.map((o,j)=>`<button class="opt" id="o${i}${j}" onclick="pick(${i},${j})"><span class="lt">${L[j]}</span><span>${o}</span></button>`).join('');
+    c.innerHTML=`<div class="qmeta"><span class="qnum">Q${q.n}</span><span class="qtopic">${q.tp}</span></div>${ctx}<div class="qtext">${q.q.replace(/\n/g,'<br>')}</div><div class="opts">${opts}</div><div class="fb" id="fb${i}"><span class="fi"></span><span class="fm"></span></div>`;
+    el.appendChild(c);
+  });
+  upd();
+}
+
+function pick(i,j){
+  if(ans[i]!==null)return;
+  const ok=Q[i].ans;
+  const isOk=j===ok;
+  ans[i]=isOk?'ok':'er';
+  Q[i].opts.forEach((_,k)=>{document.getElementById('o'+i+k).disabled=true;});
+  document.getElementById('o'+i+j).classList.add(isOk?'correct':'wrong');
+  if(!isOk)document.getElementById('o'+i+ok).classList.add('correct');
+  const card=document.getElementById('qc'+i);
+  card.classList.add(isOk?'ok':'er');card.dataset.st=ans[i];
+  const fb=document.getElementById('fb'+i);
+  fb.classList.add('show',isOk?'correct':'wrong');
+  fb.querySelector('.fi').textContent=isOk?'✅':'❌';
+  fb.querySelector('.fm').textContent=isOk?'Parabéns! Resposta correta!':`Incorreta. A correta era: ${L[ok]}) ${Q[i].opts[ok]}`;
+  upd();
+  if(ans.every(a=>a!==null))setTimeout(showResult,1200);
+}
+
+function upd(){
+  const tot=Q.length,ok=ans.filter(a=>a==='ok').length,er=ans.filter(a=>a==='er').length,done=ok+er,pct=Math.round(done/tot*100);
+  document.getElementById('pl').textContent=`${done} de ${tot} respondidas`;
+  document.getElementById('pf').style.width=pct+'%';
+  document.getElementById('pc').textContent=pct+'%';
+  document.getElementById('sc').textContent=ok;
+  document.getElementById('sw').textContent=er;
+  document.getElementById('sr').textContent=tot-done;
+}
+
+function showResult(){
+  const tot=Q.length,ok=ans.filter(a=>a==='ok').length,pct=Math.round(ok/tot*100);
+  let e='🎉',s='Excelente desempenho!';
+  if(pct<50){e='😓';s='Continue estudando! Você consegue melhorar!';}
+  else if(pct<70){e='📚';s='Bom resultado! Revise os tópicos que errou.';}
+  else if(pct<90){e='👏';s='Ótimo! Você domina bem o conteúdo!';}
+  document.getElementById('re').textContent=e;
+  document.getElementById('rp').textContent=pct+'%';
+  document.getElementById('rs').textContent=s;
+  document.getElementById('rc').textContent=ok;
+  document.getElementById('rw').textContent=ans.filter(a=>a==='er').length;
+  document.getElementById('rt').textContent=tot;
+  const r=document.getElementById('result');r.style.display='block';
+  r.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function restart(){
+  ans=Array(Q.length).fill(null);
+  document.getElementById('result').style.display='none';
+  build();window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function filter(t,b){
+  document.querySelectorAll('.fbt').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  Q.forEach((_,i)=>{
+    const c=document.getElementById('qc'+i);if(!c)return;
+    const st=ans[i];
+    let show=true;
+    if(t==='un')show=st===null;
+    else if(t==='ok')show=st==='ok';
+    else if(t==='er')show=st==='er';
+    c.style.display=show?'':'none';
+  });
+}
+
+window.addEventListener('scroll',()=>document.getElementById('fab').classList.toggle('vis',scrollY>400));
+build();
+</script>
+</body>
+</html>
