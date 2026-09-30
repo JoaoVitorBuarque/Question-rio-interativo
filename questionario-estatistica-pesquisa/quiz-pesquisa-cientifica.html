@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz — Iniciação de Pesquisa Científica</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --card: #1e2133;
+    --card2: #252840;
+    --accent: #22c55e;
+    --accent2: #4ade80;
+    --purple: #6c63ff;
+    --green: #22c55e;
+    --red: #ef4444;
+    --yellow: #f59e0b;
+    --text: #e2e6ff;
+    --muted: #8890b0;
+    --border: #2e3254;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Fundo decorativo */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -200px; left: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(34,197,94,0.12) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -150px; right: -150px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(108,99,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 32px 16px 80px;
+  }
+
+  /* ── HEADER ── */
+  .header { text-align: center; margin-bottom: 40px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(34,197,94,0.15);
+    border: 1px solid rgba(34,197,94,0.35);
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-size: 13px; font-weight: 600;
+    color: var(--accent2);
+    margin-bottom: 18px;
+    letter-spacing: 0.03em;
+  }
+  .header h1 {
+    font-size: clamp(24px, 5vw, 36px);
+    font-weight: 800;
+    background: linear-gradient(135deg, #fff 0%, var(--accent2) 60%, #bbf7d0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+  .header p { color: var(--muted); font-size: 15px; }
+
+  /* ── PROGRESSO ── */
+  .progress-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .progress-top {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px;
+  }
+  .progress-label { font-size: 13px; color: var(--muted); }
+  .progress-pct { font-size: 15px; font-weight: 700; color: var(--accent2); }
+  .progress-bar-bg {
+    height: 8px; border-radius: 999px;
+    background: rgba(34,197,94,0.15);
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%; border-radius: 999px;
+    background: linear-gradient(90deg, #16a34a, #22c55e);
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+
+  /* ── PILLS ── */
+  .pills { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+  .pill {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: 999px;
+    font-size: 13px; font-weight: 600;
+  }
+  .pill-correct { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+  .pill-wrong   { background: rgba(239,68,68,0.15);  color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+  .pill-remain  { background: rgba(34,197,94,0.12); color: var(--accent2); border: 1px solid rgba(34,197,94,0.25); }
+
+  /* ── FILTROS ── */
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
+  .filter-btn {
+    padding: 7px 16px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--card); color: var(--muted);
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+  }
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent2); }
+  .filter-btn.active {
+    background: rgba(34,197,94,0.2);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 20px;
+    transition: border-color 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #16a34a, #22c55e);
+    border-radius: 16px 16px 0 0;
+    transition: background 0.3s;
+  }
+  .card.answered-correct { border-color: rgba(34,197,94,0.5); }
+  .card.answered-correct::before { background: linear-gradient(90deg, #16a34a, #22c55e); }
+  .card.answered-wrong   { border-color: rgba(239,68,68,0.5); }
+  .card.answered-wrong::before   { background: linear-gradient(90deg, #b91c1c, #ef4444); }
+
+  .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .q-num {
+    background: rgba(34,197,94,0.25);
+    color: var(--accent2);
+    border-radius: 8px;
+    padding: 4px 12px;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  .q-topic {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .ctx-block {
+    background: rgba(34,197,94,0.07);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-size: 13.5px;
+    color: #b0b8d8;
+    line-height: 1.65;
+  }
+
+  .q-text {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text);
+    margin-bottom: 20px;
+    font-weight: 400;
+  }
+
+  /* ── ALTERNATIVAS ── */
+  .opts { display: flex; flex-direction: column; gap: 10px; }
+  .opt {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #ffffff !important;
+    text-align: left;
+    width: 100%;
+    transition: all 0.18s;
+    line-height: 1.5;
+  }
+  .opt span   { color: #ffffff !important; }
+  .opt .lt    { color: #ffffff !important; }
+  .opt:disabled { color: #ffffff !important; cursor: default; }
+  .opt.correct  { color: #ffffff !important; }
+  .opt.wrong    { color: #ffffff !important; }
+
+  .opt:not(:disabled):hover {
+    transform: translateX(3px);
+    background: rgba(34,197,94,0.12);
+    border-color: rgba(34,197,94,0.4);
+    color: #ffffff !important;
+  }
+  .lt {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    background: rgba(34,197,94,0.2);
+    color: #ffffff !important;
+    font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .opt.correct {
+    background: rgba(34,197,94,0.15) !important;
+    border-color: rgba(34,197,94,0.5) !important;
+    color: #ffffff !important;
+    animation: pulse 0.5s ease;
+  }
+  .opt.correct .lt {
+    background: rgba(34,197,94,0.35);
+    color: #ffffff !important;
+  }
+  .opt.wrong {
+    background: rgba(239,68,68,0.15) !important;
+    border-color: rgba(239,68,68,0.5) !important;
+    color: #ffffff !important;
+    animation: shake 0.4s ease;
+  }
+  .opt.wrong .lt {
+    background: rgba(239,68,68,0.35);
+    color: #ffffff !important;
+  }
+  .opt:disabled:not(.correct):not(.wrong) {
+    opacity: 0.5;
+    color: #ffffff !important;
+  }
+
+  @keyframes pulse {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.02); }
+    100% { transform: scale(1); }
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20%     { transform: translateX(-6px); }
+    40%     { transform: translateX(6px); }
+    60%     { transform: translateX(-4px); }
+    80%     { transform: translateX(4px); }
+  }
+
+  /* ── FEEDBACK ── */
+  .feedback {
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback.fb-correct {
+    background: rgba(34,197,94,0.12);
+    border: 1px solid rgba(34,197,94,0.35);
+    color: #86efac;
+  }
+  .feedback.fb-wrong {
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.3);
+    color: #fca5a5;
+  }
+
+  /* ── RESULTADO FINAL ── */
+  #result-screen {
+    display: none;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 48px 32px;
+    text-align: center;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  #result-screen::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #16a34a, #86efac, #16a34a);
+  }
+  .result-emoji { font-size: 64px; margin-bottom: 12px; }
+  .result-pct {
+    font-size: clamp(48px, 10vw, 72px);
+    font-weight: 800;
+    background: linear-gradient(135deg, #fff, var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+  .result-msg { color: var(--muted); font-size: 16px; margin-bottom: 32px; }
+  .result-cards { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 32px; }
+  .result-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 28px;
+    min-width: 120px;
+  }
+  .result-card-num { font-size: 32px; font-weight: 800; }
+  .result-card-num.green { color: var(--green); }
+  .result-card-num.red   { color: var(--red); }
+  .result-card-num.blue  { color: var(--accent2); }
+  .result-card-lbl { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .btn-retry {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    color: #fff;
+    border: none; border-radius: 10px;
+    padding: 14px 32px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px; font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .btn-retry:hover { opacity: 0.9; transform: translateY(-1px); }
+
+  /* ── FAB ── */
+  #fab {
+    position: fixed; bottom: 28px; right: 24px;
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    border: none; cursor: pointer;
+    color: #fff; font-size: 20px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 20px rgba(34,197,94,0.4);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s, transform 0.2s;
+    z-index: 100;
+  }
+  #fab.visible { opacity: 1; pointer-events: all; }
+  #fab:hover { transform: scale(1.1); }
+
+  /* ── CODE BLOCK ── */
+  .code-block {
+    background: #0d1117;
+    border: 1px solid #2d3250;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-family: 'Courier New', monospace;
+    font-size: 12.5px;
+    color: #a9b1d6;
+    line-height: 1.6;
+    margin-bottom: 14px;
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  @media (max-width: 600px) {
+    .card { padding: 20px 16px; }
+    .result-cards { gap: 10px; }
+    .result-card { padding: 16px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap" id="top">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="badge">🔬 Iniciação de Pesquisa Científica</div>
+    <h1>Questionário de Revisão</h1>
+    <p id="subtitle"><span id="q-total-label">53</span> questões • Metodologia científica, normas de pesquisa e produção acadêmica</p>
+  </div>
+
+  <!-- PROGRESSO -->
+  <div class="progress-box">
+    <div class="progress-top">
+      <span class="progress-label" id="prog-text">0 de 35 respondidas</span>
+      <span class="progress-pct" id="prog-pct">0%</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="prog-bar"></div>
+    </div>
+  </div>
+
+  <!-- PILLS -->
+  <div class="pills">
+    <span class="pill pill-correct">✅ Corretas: <b id="cnt-c">0</b></span>
+    <span class="pill pill-wrong">❌ Erradas: <b id="cnt-w">0</b></span>
+    <span class="pill pill-remain">⏳ Restantes: <b id="cnt-r">35</b></span>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="filters">
+    <button class="filter-btn active" data-filter="all">Todas</button>
+    <button class="filter-btn" data-filter="unanswered">Não respondidas</button>
+    <button class="filter-btn" data-filter="correct">Corretas</button>
+    <button class="filter-btn" data-filter="wrong">Erradas</button>
+  </div>
+
+  <!-- RESULTADO FINAL -->
+  <div id="result-screen">
+    <div class="result-emoji" id="res-emoji">🏆</div>
+    <div class="result-pct" id="res-pct">0%</div>
+    <div class="result-msg" id="res-msg"></div>
+    <div class="result-cards">
+      <div class="result-card">
+        <div class="result-card-num green" id="res-c">0</div>
+        <div class="result-card-lbl">Corretas</div>
+      </div>
+      <div class="result-card">
+        <div class="result-card-num red" id="res-w">0</div>
+        <div class="result-card-lbl">Erradas</div>
+      </div>
+      <div class="result-card">
+        <div class="result-card-num blue" id="res-total">53</div>
+        <div class="result-card-lbl">Total</div>
+      </div>
+    </div>
+    <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Questionário</button>
+  </div>
+
+  <!-- QUESTÕES -->
+  <div id="questions-container"></div>
+
+</div>
+
+<!-- FAB -->
+<button id="fab" title="Voltar ao topo" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+// BANCO DE QUESTÕES — INICIAÇÃO DE PESQUISA CIENTÍFICA
+// Formato padrão de cada item:
+// {
+//   n: 1,
+//   tp: "Tópico / Unidade",
+//   ctx: "Texto base ou contextualização da questão (opcional)",
+//   q: "Enunciado da pergunta",
+//   opts: ["Alternativa A", "Alternativa B", "Alternativa C", "Alternativa D", "Alternativa E"],
+//   ans: 0, // Índice da alternativa correta (0 = A, 1 = B, 2 = C, 3 = D, 4 = E)
+//   explanation: "Explicação detalhada da resposta correta."
+// }
+// ─────────────────────────────────────────────────────────────
+const Q = [
+  {
+    "n": 1,
+    "tp": "Metodologia de Leitura Acadêmica",
+    "code": "",
+    "ctx": "A leitura é uma habilidade essencial para pesquisadores iniciantes, permitindo a aquisição de conhecimento, ampliação da compreensão do mundo e aprimoramento do pensamento crítico. No entanto, muitos ainda não exploram todo o potencial dessa habilidade, pois não dominam a arte de ler de maneira eficiente e com propósito. (Disponível em: https://pesquisatec.com/blog/lendo-com-proposito, Acesso 11 jun. 2023).",
+    "q": "Na leitura de textos acadêmicos, o nível de leitura mais complexo é o de:",
+    "opts": [
+      "leitura elementar.",
+      "leitura analítica.",
+      "leitura sintópica.",
+      "leitura crítica.",
+      "leitura inspecional."
+    ],
+    "ans": 2,
+    "explanation": "De acordo com Mortimer Adler em 'Como Ler Livros' (obra de referência clássica em metodologia de leitura), existem 4 níveis fundamentais de leitura: elementar, inspecional, analítica e sintópica. O nível mais elevado e complexo é a leitura sintópica (ou comparativa), na qual o leitor analisa múltiplos textos e autores sobre o mesmo tema, articulando conceitos e construindo uma visão abrangente que vai além de qualquer obra isolada.",
+    "sources": [
+      "Exercicios questionarios Iniciação a Pesquisa Científica.pdf (Pág 1)",
+      "Iniciação a Pesquisa Científica, atividades 1 e 3.pdf (Pág 3 - Pergunta 4)"
+    ]
+  },
+  {
+    "n": 2,
+    "tp": "Epistemologia e Método Cartesiano",
+    "code": "",
+    "ctx": "Para investigar a verdade, o filósofo francês René Descartes (1596-1650) elaborou um método para orientar sua razão. Toda sua filosofia é construída com o auxílio desse método, desde a descrição de um arco-íris até admitir o movimento da terra e tentar demonstrar a existência de Deus e da alma de forma racional. (Disponível em: https://www.netmundi.org/filosofia/2012/o-metodo-de-descartes/, Acesso em 11 jun. 2023).",
+    "q": "Qual das seguintes afirmações é verdadeira sobre o método de Descartes?",
+    "opts": [
+      "O método de Descartes consiste em começar pelos textos mais complexos e depois avançar para os mais simples.",
+      "O método de Descartes pode ser adaptado e ainda é útil para auxiliar na organização de leituras especializadas.",
+      "O método de Descartes é essencialmente baseado no racionalismo e não considera o empirismo.",
+      "O método de Descartes é uma abordagem ultrapassada e não tem relevância atual.",
+      "O método de Descartes é adequado apenas para pesquisadores iniciantes."
+    ],
+    "ans": 1,
+    "explanation": "As quatro regras fundamentais do método cartesiano (evidência, divisão/análise, ordem/síntese e enumeração/revisão) continuam plenamente válidas e aplicáveis na prática acadêmica contemporânea para organizar, decompor e estruturar com clareza a leitura e a escrita científica especializada.",
+    "sources": [
+      "Exercicios questionarios Iniciação a Pesquisa Científica.pdf (Pág 2)"
+    ]
+  },
+  {
+    "n": 3,
+    "tp": "Ato de Ler e Consciência Crítica",
+    "code": "",
+    "ctx": "Me parece indispensável, ao procurar falar de tal importância, dizer algo do momento mesmo em que me preparava para aqui estar hoje; dizer algo do processo em que me inseri enquanto ia escrevendo este texto que agora leio, processo que envolvia uma compreensão crítica do ato de ler, que não se esgota na decodificação pura da palavra escrita ou da linguagem escrita, mas que se antecipa e se alonga na inteligência do mundo. (FREIRE, P. A Importância do ato de ler: em três artigos que se completam (1981). São Paulo: Cortez Editora, p. 9, 2021).",
+    "q": "Considere as seguintes afirmativas:\n\nI. A leitura ativa limita as pessoas em seus próprios mundos.\nII. O ato de ler não se limita à mera decodificação de palavras.\nIII. A decodificação de palavras depende da leitura crítica.\nIV. A compreensão crítica do ato de ler se antecipa e se alonga na inteligência do mundo.\n\nDe acordo com o texto, é correto o que se afirma apenas em:",
+    "opts": [
+      "I e II, apenas.",
+      "II e III, apenas.",
+      "II e IV, apenas.",
+      "III e IV, apenas.",
+      "I e III, apenas."
+    ],
+    "ans": 2,
+    "explanation": "Segundo Paulo Freire, 'a leitura do mundo precede a leitura da palavra'. O ato de ler não se esgota na simples decodificação mecânica da linguagem escrita (afirmativa II verdadeira) e prolonga-se na inteligência do mundo e na compreensão da realidade vivida (afirmativa IV verdadeira). As afirmativas I e III deturpam o pensamento freiriano.",
+    "sources": [
+      "Exercicios questionarios Iniciação a Pesquisa Científica.pdf (Pág 3)",
+      "Iniciação a Pesquisa Científica, atividades 1 e 3.pdf (Pág 2 - Pergunta 2)",
+      "WhatsApp Image 2026-09-08 at 18.15.01 (3).jpeg"
+    ]
+  },
+  {
+    "n": 4,
+    "tp": "Teoria do Conhecimento (Problema de Gettier)",
+    "code": "",
+    "ctx": "Gettier mostra que mesmo um agente tendo uma crença verdadeira e justificada, a sorte ainda pode desempenhar um papel fundamental, tornando intuitivamente inviável atribuirmos a ele conhecimento pelo seu sucesso cognitivo. (Disponível em: https://www.redalyc.org/journal/5766/576674496018/html/, Acesso em: 06 jun. 2023).",
+    "q": "O que objetivava o desafio proposto por Edmund Gettier à definição tradicional de conhecimento?",
+    "opts": [
+      "Mostrar que a definição tradicional é insuficientemente ampla.",
+      "Investigar as questões epistemológicas mais fundamentais.",
+      "Oferecer uma justificação adequada para uma crença verdadeira.",
+      "Discutir os problemas e discussões da natureza do conhecimento.",
+      "Apresentar contraexemplos à definição tradicional de conhecimento."
+    ],
+    "ans": 4,
+    "explanation": "No célebre artigo de 1963 ('Is Justified True Belief Knowledge?'), Edmund Gettier elaborou contraexemplos demonstrando casos em que um indivíduo possui uma crença que é simultaneamente verdadeira e justificada, mas apenas por coincidência ou sorte epistêmica, provando que a definição tradicional tripartite (crença verdadeira justificada) não é suficiente para caracterizar o conhecimento autêntico.",
+    "sources": [
+      "Exercicios questionarios Iniciação a Pesquisa Científica.pdf (Pág 4)",
+      "WhatsApp Image 2026-09-08 at 18.15.01 (2).jpeg"
+    ]
+  },
+  {
+    "n": 5,
+    "tp": "Epistemologia de Bertrand Russell",
+    "code": "",
+    "ctx": "\"A importância principal do conhecimento por descrição é que nos permite ir além da nossa experiência privada. Apesar do facto de podermos apenas conhecer verdades que são completamente compostas de termos de que tivemos experiência por contacto, podemos, contudo, ter conhecimento por descrição de coisas de que nunca tivemos experiência. Face ao âmbito muitíssimo restrito da nossa experiência imediata, este resultado é vital e, enquanto não for compreendido, muito do nosso conhecimento continuará forçosamente misterioso e logo duvidoso.\" (RUSSELL, B. Os Problemas da Filosofia. Tradução de Desidério Murcho. Lisboa: Edições 70, 2008, p. 118).",
+    "q": "Com base nessas informações, avalie as asserções a seguir e a relação proposta entre elas:\n\nI. O âmbito do conhecimento por contato é restrito à nossa experiência imediata.\n\nPORQUE\n\nII. O conhecimento por descrição aumenta o escopo de conhecimento que podemos adquirir.\n\nA respeito dessas asserções, assinale a opção correta:",
+    "opts": [
+      "As asserções I e II são proposições falsas.",
+      "As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.",
+      "A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.",
+      "A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.",
+      "As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I."
+    ],
+    "ans": 1,
+    "explanation": "Ambas as proposições são verdadeiras na filosofia de Bertrand Russell: o conhecimento por contato é restrito à nossa percepção sensorial direta e imediata, enquanto o conhecimento por descrição nos capacita a ultrapassar essa barreira privada. Entretanto, a asserção II não justifica a I (a finitude do contato decorre da limitação intrínseca dos nossos órgãos sensoriais, e não do fato de a descrição ampliar nosso horizonte).",
+    "sources": [
+      "Exercicios questionarios Iniciação a Pesquisa Científica.pdf (Pág 5)"
+    ]
+  },
+  {
+    "n": 6,
+    "tp": "Revisão Bibliográfica Sistemática",
+    "code": "",
+    "ctx": "Para conseguir avançar em determinado campo do conhecimento é preciso primeiro conhecer o que já foi desenvolvido por outros pesquisadores. Realizar uma pesquisa bibliográfica faz parte do cotidiano de todos os estudantes e pesquisadores. (Disponível em: https://www.esalq.usp.br/biblioteca/content/como-fazer-uma-revis%C3%A3o-bibliogr%C3%A1fica, Acesso em: 13 jun. 2023).",
+    "q": "Como é realizada a construção da revisão bibliográfica? Considere os elementos:\n\nI. Através do levantamento bibliográfico e seleção de palavras-chave.\nII. Através de pesquisa em fontes confiáveis e organização das referências.\nIII. Através do planejamento da escrita e da seleção das palavras-chave.\n\nÉ correto o que se afirma apenas em:",
+    "opts": [
+      "II e III, apenas.",
+      "I, II e III.",
+      "I, apenas.",
+      "III, apenas.",
+      "I e II, apenas."
+    ],
+    "ans": 1,
+    "explanation": "Todas as três etapas integram o processo metodológico de construção da revisão de literatura: o levantamento inicial e definição dos termos de busca (I), a coleta criteriosa em bases de dados confiáveis com fichamento/organização referencial (II) e o planejamento textual articulado à refinada seleção de descritores e palavras-chave (III).",
+    "sources": [
+      "Exercicios questionarios Iniciação a Pesquisa Científica.pdf (Pág 6)"
+    ]
+  },
+  {
+    "n": 7,
+    "tp": "Citações e Normas Acadêmicas",
+    "code": "",
+    "ctx": "Citações são trechos de textos trazidos para a composição do trabalho, com o intuito de dar mais fundamentação e mostrar que a pesquisa não inicia 'do zero'.",
+    "q": "Sobre o tema de citações, leia as proposições:\n\nI - As citações diretas nunca podem ser feitas com as mesmas palavras do autor da fonte, devendo ser interpretada.\nII - As citações indiretas são tipos de paráfrases que trazem as ideias do texto fonte original, mas não com as mesmas palavras.\nIII - As citações diretas e indiretas servem para dar fundamento ao trabalho, indicando que o texto parte de ideias já desenvolvidas.\nIV - As referências das citações devem sempre vir em nota de rodapé.\n\nÉ correto o que se afirma apenas em:",
+    "opts": [
+      "II e IV, apenas.",
+      "I e III, apenas.",
+      "II e III, apenas.",
+      "III e IV, apenas.",
+      "I e II, apenas."
+    ],
+    "ans": 2,
+    "explanation": "As afirmativas II e III são corretas. A citação indireta é uma paráfrase fiel do conteúdo original com as palavras do autor do trabalho (II), e ambas as citações servem de alicerce teórico ao demonstrar o estado da arte (III). A proposição I é falsa (citação direta é a transcrição textual exata) e a IV é falsa (as fontes das citações no sistema autor-data vêm no corpo do texto e na lista final de referências).",
+    "sources": [
+      "Exercicios questionarios Iniciação a Pesquisa Científica.pdf (Pág 7)"
+    ]
+  },
+  {
+    "n": 8,
+    "tp": "Tipos de Citação (Apud)",
+    "code": "",
+    "ctx": "Para dar maior solidez ao TCC, é altamente recomendado que o aluno faça uso de excertos das obras consultadas em seu próprio trabalho, exemplificando com citações do autor o conceito que é discutido em seu texto. Mas e quando a obra consultada também está fazendo uso desse recurso e citando outro autor e obra? (Disponível em: https://periodicos.sbu.unicamp.br/blog/index.php/2018/04/15/citacao/, Acesso em 11 jun. 2023).",
+    "q": "O trecho fala exatamente de:",
+    "opts": [
+      "citação de citação, quando deve ser usado o termo apud.",
+      "citação direta, quando deve ser apresentado o sobrenome com letras maiúsculas.",
+      "citação indireta, quando há vários autores de um mesmo texto fonte e deve ser usada a expressão et al.",
+      "citação de citação, quando deve ser usado o termo ibidem.",
+      "citação indireta, quando há apenas um autor do texto original."
+    ],
+    "ans": 0,
+    "explanation": "Quando um autor cita um trecho de outro autor contido em uma obra intermediária à qual se teve acesso direto, ocorre uma 'citação de citação', regulada pela ABNT mediante o uso da expressão latina 'apud' (que significa 'citado por').",
+    "sources": [
+      "Exercicios questionarios Iniciação a Pesquisa Científica.pdf (Pág 8)"
+    ]
+  },
+  {
+    "n": 9,
+    "tp": "Regras da ABNT NBR 10520",
+    "code": "",
+    "ctx": "Citação é o ato ou efeito de citar ou um texto ou opinião citada (MICHAELIS, 2022). A ABNT/NBR 10520:2002 aborda todas as regras de como citar um texto na íntegra (citação direta) ou uma ideia já mencionada em outra publicação (citação indireta).",
+    "q": "Com base no texto, responda:\n\nI. É proibido citar o texto de outro autor na íntegra no texto acadêmico.\nII. Pode-se citar qualquer texto desde que seja citado e referenciado da forma correta.\nIII. É proibido citar um artigo científico que não possua autor.\nIV. Só é possível citar a ideia de um outro autor e escrever com as próprias palavras.\n\nÉ correto o que se afirma apenas em:",
+    "opts": [
+      "I e II.",
+      "II.",
+      "III.",
+      "IV e III.",
+      "I."
+    ],
+    "ans": 1,
+    "explanation": "Apenas a afirmação II é verdadeira. A metodologia científica e a ABNT permitem a utilização de qualquer texto acadêmico ou documento público, desde que devidamente atribuído ao autor original e referenciado conforme as normas. As citações diretas (na íntegra) são permitidas (tornando I e IV falsas), e documentos institucionais sem autoria pessoal expressa podem ser citados indicando a entidade responsável (tornando III falsa).",
+    "sources": [
+      "Exercicios questionarios Iniciação a Pesquisa Científica.pdf (Pág 9)"
+    ]
+  },
+  {
+    "n": 10,
+    "tp": "Indexação e Palavras-chave",
+    "code": "",
+    "ctx": "A partir do momento em que um material é publicado, as pessoas ligadas à área da programação precisam se preocupar com a forma a partir da qual esses materiais armazenados em uma base x poderão ser buscados, acessados e citados (...). (Disponível em: https://www.nucleodoconhecimento.com.br/blog/artigo-cientifico/palavras-chave, Acesso em 11 jun. 2023).",
+    "q": "Um recurso importante para auxiliar nas buscas, agilizando tal mecanismo em bases de dados, é a definição que um autor faz de:",
+    "opts": [
+      "problemas.",
+      "objetivos.",
+      "referências.",
+      "palavras chaves.",
+      "metodologias."
+    ],
+    "ans": 3,
+    "explanation": "As palavras-chave (keywords ou descritores) constituem termos padronizados essenciais para a indexação em bases de dados e mecanismos de busca acadêmica, permitindo a localização ágil e a recuperação do trabalho por pesquisadores interessados no tema.",
+    "sources": [
+      "Exercicios questionarios Iniciação a Pesquisa Científica.pdf (Pág 10)",
+      "Iniciação a Pesquisa Científica, atividades 1 e 3.pdf (Pág 5 - Pergunta 2)",
+      "WhatsApp Image 2026-09-14 at 17.34.45.jpeg"
+    ]
+  },
+  {
+    "n": 11,
+    "tp": "Normas ABNT (Tese vs. Dissertação)",
+    "code": "",
+    "ctx": "De acordo com as normas da Associação Brasileira de Normas Técnicas (ABNT), a distinção entre os trabalhos de conclusão da pós-graduação stricto sensu define requisitos acadêmicos próprios para os graus de mestre e doutor.",
+    "q": "De acordo com as normas da Associação Brasileira de Normas Técnicas (ABNT), avalie as asserções a seguir e a relação proposta entre elas:\n\nI. A diferença entre tese e dissertação é dada pelo tipo de material consultado.\n\nPORQUE\n\nII. Candidatos ao doutorado devem defender teses originais como requisito para a obtenção do título, enquanto candidatos ao título de mestre não têm a necessidade de defesa de uma tese original.\n\nA respeito dessas asserções, assinale a opção correta:",
+    "opts": [
+      "A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.",
+      "As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I.",
+      "As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.",
+      "A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.",
+      "As asserções I e II são proposições falsas."
+    ],
+    "ans": 3,
+    "explanation": "A asserção I é FALSA porque a diferença entre tese (doutorado) e dissertação (mestrado) não decorre do tipo de material consultado (ambas utilizam livros, artigos e documentos científicos), mas sim da natureza e profundidade da contribuição científica exigida. A asserção II é VERDADEIRA porque o doutorado exige obrigatoriamente a defesa de uma tese inédita e original, com real avanço ao conhecimento, enquanto no mestrado a dissertação tem como foco comprovar o domínio do tema e da metodologia científica, sem a exigência formal de ineditismo.",
+    "sources": [
+      "Iniciação a Pesquisa Científica, atividades 1 e 3.pdf (Pág 2 - Pergunta 1)",
+      "WhatsApp Image 2026-09-08 at 18.15.01 (4).jpeg"
+    ]
+  },
+  {
+    "n": 12,
+    "tp": "Epistemologia e Filosofia da Ciência",
+    "code": "",
+    "ctx": "A maior parte dos estudantes faz meus cursos para satisfazer requisitos curriculares, nunca tendo participado antes de uma aula de filosofia. No primeiro dia do semestre, tento dar a eles uma ideia do que se trata a filosofia da ciência. Começo explicando que a filosofia lida com questões que não podem ser resolvidas apenas com os fatos, e que a filosofia da ciência é a aplicação desta abordagem ao domínio da ciência. (Disponível em: https://www.nexojornal.com.br/, Acesso em: 06 jun. 2023).",
+    "q": "Qual é o principal objetivo da filosofia da ciência?",
+    "opts": [
+      "Ampliar horizontes através descobertas científicas.",
+      "Justificar o pensamento sobre o sentido da ciência.",
+      "Desenvolver avanços tecnológicos.",
+      "Investigar os fundamentos das ciências.",
+      "Manipular a natureza."
+    ],
+    "ans": 3,
+    "explanation": "O objetivo primordial da filosofia da ciência é investigar os fundamentos conceituais, lógicos e ontológicos do conhecimento científico, analisando métodos, critérios de validade, limites do saber e a estrutura das teorias, ao invés de realizar experimentos ou gerar novas aplicações técnicas imediatas.",
+    "sources": [
+      "Iniciação a Pesquisa Científica, atividades 1 e 3.pdf (Pág 3 - Pergunta 3)"
+    ]
+  },
+  {
+    "n": 13,
+    "tp": "Senso Comum vs. Conhecimento Científico",
+    "code": "",
+    "ctx": "O senso comum contribui para que a ciência progrida a partir de dificuldades que emergem no dia-a-dia das pessoas. Poderíamos elencar várias situações problemas vividas em contextos sociais que exigem da comunidade científica a necessidade de pesquisar, de aprofundar interpretações dos achados e propor soluções ou indicar caminhos para as dificuldades enfrentadas pela população. (RIOS, E. R. G. et al. Senso comum, ciência e filosofia: elo dos saberes necessários à promoção da saúde. Ciência & Saúde Coletiva, v. 12, n. 2, p. 501-509, mar. 2007).",
+    "q": "Qual é a principal diferença entre o conhecimento popular e o conhecimento científico?",
+    "opts": [
+      "O conhecimento popular é mais confiável e preciso do que o conhecimento científico.",
+      "O conhecimento popular é restrito a questões culturais, enquanto o conhecimento científico abrange todas as áreas do conhecimento.",
+      "O conhecimento popular é baseado em crendices, enquanto o conhecimento científico é fundamentado em práticas científicas estabelecidas.",
+      "O conhecimento popular é adquirido informalmente, enquanto o conhecimento científico é adquirido por meio de instituições acadêmicas.",
+      "O conhecimento popular é transmitido de forma oral, enquanto o conhecimento científico é transmitido de forma escrita."
+    ],
+    "ans": 2,
+    "explanation": "O conhecimento popular (ou senso comum) baseia-se em crenças transmitidas culturalmente, intuições e vivências espontâneas sem comprovação controlada, ao passo que o conhecimento científico se alicerça no rigor metodológico, em práticas de pesquisa estabelecidas, na testabilidade empírica e na revisão por pares.",
+    "sources": [
+      "Iniciação a Pesquisa Científica, atividades 1 e 3.pdf (Pág 3 - Pergunta 5)"
+    ]
+  },
+  {
+    "n": 14,
+    "tp": "Critérios para Escolha do Tema de Pesquisa",
+    "code": "",
+    "ctx": "Tema e problema de pesquisa não significam a mesma coisa. O problema a ser investigado deve vir do tema de pesquisa, especificando-o.",
+    "q": "Ao se pensar a escolha do tema de pesquisa, assinale a alternativa que apresenta os fatores importantes a serem considerados:",
+    "opts": [
+      "Afetividade pelo assunto, tempo adequado, tema irrelevante, conteúdo de base, conhecimento teórico do aluno.",
+      "Afetividade pelo assunto, tempo inadequado, tema relevante, conteúdo insuficiente, conhecimento teórico do aluno.",
+      "Afetividade pelo assunto, tempo adequado, tema relevante, conteúdo de base, conhecimento prático do aluno.",
+      "Afetividade pelo assunto, tempo adequado, tema irrelevante, conteúdo insuficiente, conhecimento teórico do aluno.",
+      "Afetividade pelo assunto, tempo adequado, tema relevante, conteúdo de base, conhecimento teórico do aluno."
+    ],
+    "ans": 4,
+    "explanation": "A escolha bem-sucedida do tema exige aliar fatores subjetivos e objetivos: afetividade/interesse pelo assunto, disponibilidade de tempo adequado para execução, relevância acadêmica e social do tema, existência de conteúdo de base/literatura bibliográfica acessível e prévio conhecimento teórico do aluno pesquisador.",
+    "sources": [
+      "Iniciação a Pesquisa Científica, atividades 1 e 3.pdf (Pág 5 - Pergunta 1)"
+    ]
+  },
+  {
+    "n": 15,
+    "tp": "Originalidade e Prevenção ao Plágio",
+    "code": "",
+    "ctx": "Assim como já diria Armando Nogueira: \"Copiar o bom é melhor que inventar o ruim\", em todo o tipo de trabalho ou criação de projetos, acabamos copiando ou emprestando parte do conhecimento de outras pessoas. Entretanto, isso não ocorre porque não tivemos a capacidade de pensar em algo do gênero antes, mas sim porque existem fontes que realmente servem como base para desenvolver um trabalho, e, consequentemente, devem ser usadas e consultadas. (Disponível em: https://www.tecmundo.com.br/tutorial/834-aprenda-a-usar-as-normas-da-abnt-citacao-2-de-4-.htm, Acesso em 11 jun. 2023).",
+    "q": "Leia as proposições e atribua valores V ou F:\n\n( ) Não existe citação de citação.\n( ) Citações são indicações de outros textos que fundamentam o trabalho realizado.\n( ) Ao citar um texto que outro autor citou, e eu não tenho contato com o original, devo usar o 'apud'.\n( ) Citações de um texto com vários autores devem trazer o nome de todos eles separadamente.\n( ) As referências das citações são importantes para não se incorrer em plágio.\n\nA sequência correta de cima para baixo é:",
+    "opts": [
+      "F, V, F, V, F.",
+      "F, V, V, F, V.",
+      "V, V, V, F, F.",
+      "V, V, F, F, V.",
+      "V, F, V, F, V."
+    ],
+    "ans": 1,
+    "explanation": "A sequência correta é F, V, V, F, V: 1ª (Falsa: existe citação de citação); 2ª (Verdadeira: citações fundamentam o trabalho); 3ª (Verdadeira: na impossibilidade de acessar o original usa-se 'apud'); 4ª (Falsa: textos com muitos autores utilizam 'et al.'); 5ª (Verdadeira: a referenciação correta evita a ocorrência de plágio).",
+    "sources": [
+      "Iniciação a Pesquisa Científica, atividades 1 e 3.pdf (Pág 6 - Pergunta 3)",
+      "WhatsApp Image 2026-09-14 at 17.34.45 (1).jpeg"
+    ]
+  },
+  {
+    "n": 16,
+    "tp": "Normas ABNT NBR 6023 (Referências de Periódicos)",
+    "code": "",
+    "ctx": "Leia esta referência:\n\nLIMA FILHO, J. E.. Esclarecimento e educação em Kant: a autonomia como projeto de melhoramento humano. Trans/Form/Ação, v. 42, n. 2, p. 59-84, abr. 2019.",
+    "q": "Avalie as asserções a seguir e a relação proposta entre elas:\n\nI. A referência acima está escrita corretamente.\n\nPORQUE\n\nII. Ao referenciar um texto de uma revista, o nome dela deve vir em destaque.\n\nA respeito dessas asserções, assinale a opção correta:",
+    "opts": [
+      "As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I.",
+      "A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.",
+      "A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.",
+      "As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.",
+      "As asserções I e II são proposições falsas."
+    ],
+    "ans": 2,
+    "explanation": "A asserção I é falsa porque a referência apresentada possui falhas de formatação (o título do periódico 'Trans/Form/Ação' não está em destaque tipográfico obrigatório - negrito ou itálico - conforme exige a ABNT NBR 6023, além de haver pontuação dupla '..'). A asserção II é verdadeira porque a norma determina expressamente que em referências de artigos de periódicos o elemento em destaque é o título da publicação/revista.",
+    "sources": [
+      "Iniciação a Pesquisa Científica, atividades 1 e 3.pdf (Pág 6 - Pergunta 4)",
+      "WhatsApp Image 2026-09-14 at 17.34.45 (3).jpeg"
+    ]
+  },
+  {
+    "n": 17,
+    "tp": "Critérios de Seleção de Artigos para Publicação",
+    "code": "",
+    "ctx": "A atividade de publicação em revistas científicas envolve, além da redação qualificada do artigo, a seleção criteriosa dos títulos de periódicos mais adequados à área de conhecimento, público alvo e indicadores de impacto e qualidade. (Disponível em: https://www.abcd.usp.br/, Acesso em: 13 jun. 2023).",
+    "q": "Como as publicações são selecionadas para a construção da revisão bibliográfica? Leia as proposições:\n\nI. Com base na relevância na área acadêmica, considerando o número de vezes que são citadas em outros trabalhos e a reputação dos autores e periódicos.\nII. Com base na produção ao longo do tempo, selecionando publicações de todos os períodos do tema.\nIII. Com base na abrangência e especificidade dos assuntos das publicações em relação ao tema do projeto.\nIV. Com base na relevância na área acadêmica e na atualidade das publicações.\n\nÉ correto o que se afirma apenas em:",
+    "opts": [
+      "II, III e IV, apenas.",
+      "II e IV, apenas.",
+      "I e III, apenas.",
+      "I, III e IV, apenas.",
+      "I, II e III, apenas."
+    ],
+    "ans": 3,
+    "explanation": "A seleção científica deve considerar a relevância e métricas de impacto (I), a aderência temática e escopo específico (III) e a atualidade das publicações na fronteira do conhecimento (IV). A afirmação II é incorreta, pois não se devem selecionar indiscriminadamente publicações de todos os períodos sem critério seletivo.",
+    "sources": [
+      "Iniciação a Pesquisa Científica, atividades 1 e 3.pdf (Pág 7 - Pergunta 5)"
+    ]
+  },
+  {
+    "n": 18,
+    "tp": "Leitura Especializada de Artigos Científicos",
+    "code": "",
+    "ctx": "A leitura de um artigo científico é diferente de outros tipos de leitura, como romances, reportagens, histórias etc. A leitura de um artigo científico deve ser eminentemente crítica, cabendo ao leitor uma avaliação do que se está lendo; uma leitura às pressas de um artigo não extrai todas as informações necessárias que ele pode nos passar. (Disponível em: http://www.cienciaexplica.com.br/2018/02/17/como-ler-um-artigo-cientifico-4-passos/, Acesso em 11 jun. 2023).",
+    "q": "Complete a frase: a leitura especializada de textos científicos...",
+    "opts": [
+      "depende do domínio de ferramentas específicas em cada área de investigação.",
+      "não exige familiaridade com princípios de cálculo ou lógica proposicional.",
+      "não necessita conhecimento de cartografia ou leitura de idiomas específicos.",
+      "exige o mesmo tipo de esforço que a leitura de obras literárias.",
+      "não requer conhecimento prévio de termos e nomenclaturas específicas."
+    ],
+    "ans": 0,
+    "explanation": "A leitura acadêmico-científica especializada requer instrumentos conceituais e metodológicos específicos de sua área (como cálculos estatísticos, terminologias técnicas ou domínio de línguas estrangeiras), diferenciando-se substancialmente da leitura informal de ficção ou literatura geral.",
+    "sources": [
+      "WhatsApp Image 2026-09-08 at 18.15.01 (1).jpeg"
+    ]
+  },
+  {
+    "n": 19,
+    "tp": "Tipologia do Conhecimento (Saber-Fazer)",
+    "code": "",
+    "ctx": "O que é o conhecimento? Antes de podermos responder a esta questão temos de determinar com exatidão o que estamos a dizer quando falamos em conhecimento, uma vez que a palavra tem vários significados e há vários tipos de conhecimento. Todo o conhecimento é uma relação entre um sujeito, o agente que conhece, e um objeto, aquilo que é conhecido. Como há diferentes tipos de objetos, há também diferentes tipos de conhecimento. (Disponível em: https://criticanarede.com/anunesoqueeoconhecimento.html, Acesso em 06 jun. 2023).",
+    "q": "Qual é o tipo de conhecimento relacionado às aptidões de realizar uma determinada atividade?",
+    "opts": [
+      "Conhecimento descritivo.",
+      "Conhecimento imediato.",
+      "Conhecimento proposicional.",
+      "Conhecimento por contato.",
+      "Conhecimento prático."
+    ],
+    "ans": 4,
+    "explanation": "O conhecimento prático ('know-how' ou saber-fazer) consiste na aptidão, habilidade e competência técnica ou motora que um sujeito possui para executar determinada ação prática (como nadar, pilotar ou realizar experimentos), diferenciando-se do saber proposicional (saber que).",
+    "sources": [
+      "WhatsApp Image 2026-09-08 at 18.15.01.jpeg"
+    ]
+  },
+  {
+    "n": 20,
+    "tp": "Formas de Conhecimento Epistemológico",
+    "code": "U012024.2LL-01F",
+    "ctx": "Segundo Bernecker e Dretske (2000), na epistemologia tradicional há três principais tipos de conhecimento: conhecimento prático, conhecimento por contato e conhecimento proposicional.",
+    "q": "Sobre estes, avalie as asserções a seguir e a relação proposta entre elas:\n\nI. O conhecimento por contato, o conhecimento proposicional e o conhecimento prático são formas distintas de saber, sendo o primeiro baseado na experiência direta, o segundo em proposições verdadeiras justificadas e o terceiro na habilidade de realizar uma tarefa.\n\nPORQUE\n\nII. O conhecimento por contato pode ser considerado uma base para o desenvolvimento do conhecimento proposicional, mas não é suficiente para a aquisição de conhecimento prático.\n\nA respeito dessas asserções, assinale a opção correta:",
+    "opts": [
+      "As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I.",
+      "A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.",
+      "As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.",
+      "As asserções I e II são proposições falsas.",
+      "A asserção I é uma proposição verdadeira, e a II é uma proposição falsa."
+    ],
+    "ans": 2,
+    "explanation": "Ambas as asserções são verdadeiras: a epistemologia tradicional tripartite classifica os saberes nessas três modalidades com as exatas definições apresentadas (I), e o contato sensorial direto serve de alicerce cognitivo para formular crenças proposicionais sem ser suficiente por si só para o saber prático (II). No entanto, a asserção II não é justificativa causal da I, configurando 'proposições verdadeiras, mas a II não é justificativa da I' (conforme gabarito oficial da avaliação).",
+    "sources": [
+      "WhatsApp Image 2026-09-09 at 20.28.09.jpeg"
+    ]
+  },
+  {
+    "n": 21,
+    "tp": "Conhecimento Proposicional na Teoria Tradicional",
+    "code": "",
+    "ctx": "Sabemos já que o conhecimento consiste numa relação que um sujeito estabelece com um objeto e que esse objeto é uma certa proposição. Daqui resulta que perguntar \"O que é o conhecimento?\" é equivalente a perguntar \"O que é o conhecimento proposicional?\". (Disponível em: https://criticanarede.com/anunesoqueeoconhecimento.html, Acesso em 06 jun. 2023).",
+    "q": "Como é definido o conhecimento proposicional na teoria tradicional do conhecimento?",
+    "opts": [
+      "Conhecimento que se baseia em crenças verdadeiras, mas não justificadas.",
+      "Conhecimento que se baseia em crenças falsas e justificadas.",
+      "Conhecimento que se baseia em crenças falsas e não justificadas.",
+      "Conhecimento que se baseia em crenças verdadeiras e justificadas.",
+      "Conhecimento que se baseia em crenças justificadas, mas não verdadeiras."
+    ],
+    "ans": 3,
+    "explanation": "A definição clássica/tradicional platônica do conhecimento proposicional estabelece as três condições necessárias e conjuntamente suficientes: crença, verdade e justificação. Portanto, o conhecimento proposicional é aquele baseado em crenças verdadeiras e justificadas.",
+    "sources": [
+      "WhatsApp Image 2026-09-09 at 20.28.10 (1).jpeg"
+    ]
+  },
+  {
+    "n": 22,
+    "tp": "Estrutura dos Trabalhos Acadêmicos (ABNT NBR 14724)",
+    "code": "",
+    "ctx": "Temos como base as normas técnicas para a realização de trabalhos acadêmicos, como as normas da Associação Brasileira de Normas Técnicas (ABNT), vigentes no nosso país.",
+    "q": "De acordo com a NBR 14724, que define a estrutura dos trabalhos acadêmicos, considere as seguintes afirmações:\n\nI. Na capa, é necessário informarmos somente o título da publicação e o nome dos autores.\nII. A lombada é um elemento opcional.\nIII. Todos os elementos pós-textuais são opcionais.\nIV. Os elementos textuais consistem em: introdução, desenvolvimento e conclusão.\n\nÉ correto apenas o que se afirma apenas em:",
+    "opts": [
+      "III e IV, apenas.",
+      "II e IV, apenas.",
+      "II e III, apenas.",
+      "I e III, apenas.",
+      "I e II, apenas."
+    ],
+    "ans": 1,
+    "explanation": "De acordo com a ABNT NBR 14724: I é falsa (a capa exige obrigatoriamente instituição, autor, título, subtítulo se houver, local e ano); II é verdadeira (a lombada é elemento opcional em encadernações que a comportem); III é falsa (as Referências são pós-textuais obrigatórias); IV é verdadeira (os elementos textuais dividem-se canonicamente em introdução, desenvolvimento e conclusão).",
+    "sources": [
+      "WhatsApp Image 2026-09-09 at 20.28.10 (2).jpeg"
+    ]
+  },
+  {
+    "n": 23,
+    "tp": "Senso Comum vs. Evidência Científica",
+    "code": "U012025.2LL-01M",
+    "ctx": "Em um debate sobre mudanças climáticas nas redes sociais, uma pessoa afirma que \"o clima sempre mudou naturalmente, então o aquecimento atual não pode ser culpa da humanidade\". Outra, com formação em ciências, responde que essa visão ignora evidências empíricas, métodos de coleta de dados e análises estatísticas que indicam uma correlação robusta entre o aumento de gases de efeito estufa e atividades industriais. Ela argumenta que, embora o clima tenha variado no passado, o ritmo e a magnitude das mudanças atuais são atípicos e coincidem com o crescimento acelerado das emissões antrópicas.",
+    "q": "Considerando os critérios que distinguem o conhecimento científico do senso comum, avalie as afirmativas a seguir:\n\nI. O conhecimento científico se caracteriza por ser testável, sujeito à revisão e baseado em evidências coletadas de forma sistemática.\nII. O uso de argumentos baseados em observações informais e generalizações equivale ao método científico, desde que sejam amplamente aceitos.\nIII. A justificação de uma crença é um critério essencial para que ela seja considerada conhecimento científico, especialmente quando envolve dados, replicabilidade e validação por pares.\nIV. O conhecimento popular pode ser útil em contextos práticos, mas não substitui o rigor metodológico necessário para explicar fenômenos complexos como as mudanças climáticas.\n\nÉ correto o que se afirma em:",
+    "opts": [
+      "II, III e IV, apenas.",
+      "I, III e IV, apenas.",
+      "II e IV, apenas.",
+      "I e II, apenas.",
+      "I e III, apenas."
+    ],
+    "ans": 1,
+    "explanation": "As afirmativas I, III e IV estão corretas. A ciência opera por método sistemático, testabilidade e revisão (I), justificação empírica com replicação e avaliação por pares (III), e o conhecimento comum informal não supre o rigor exigido para fenômenos complexos (IV). A afirmativa II é falsa porque o consenso popular ou senso comum jamais equivale ao método científico.",
+    "sources": [
+      "WhatsApp Image 2026-09-09 at 20.28.10 (3).jpeg"
+    ]
+  },
+  {
+    "n": 24,
+    "tp": "Conhecimento por Contato Sensorial",
+    "code": "",
+    "ctx": "Logo, é plausível experimentar algo sem extrair de tal experiência algum conhecimento, bem como é possível conhecer sem possuir a experiência imediata sobre o objeto ou o ambiente de conhecimento. (Disponível em: https://estadodaarte.estadao.com.br/experiencia-conhecimento-augusto-carvalho/, Acesso em: 06 jun. 2023).",
+    "q": "Qual é o tipo de conhecimento obtido através de experiência direta com os nossos sentidos físicos?",
+    "opts": [
+      "Conhecimento descritivo.",
+      "Conhecimento por contato.",
+      "Conhecimento proposicional.",
+      "Conhecimento prático.",
+      "Conhecimento imediato."
+    ],
+    "ans": 1,
+    "explanation": "O conhecimento adquirido pela apreensão sensorial direta de objetos, cores, sons ou sensações imediatas é classificado na epistemologia russelliana e analítica como 'conhecimento por contato' (knowledge by acquaintance).",
+    "sources": [
+      "WhatsApp Image 2026-09-09 at 20.28.10.jpeg"
+    ]
+  },
+  {
+    "n": 25,
+    "tp": "Objetivos da Revisão Bibliográfica",
+    "code": "",
+    "ctx": "A revisão bibliográfica é um estudo feito sobre a produção existente a partir de um determinado tema; ela auxilia o pesquisador para que ele não tenha de partir de um 'nível 0' em sua pesquisa.",
+    "q": "Qual é o objetivo da revisão bibliográfica? Atribua valores V ou F:\n\n( ) Conhecer apenas as opiniões que concordam com a do pesquisador.\n( ) Evitar a duplicidade de projetos de pesquisa.\n( ) Elaborar um melhor planejamento para o projeto de pesquisa.\n( ) Ultrapassar limites e preencher as lacunas teóricas do tema.\n\nA sequência correta, de cima para baixo, é:",
+    "opts": [
+      "V, F, V, F.",
+      "F, V, V, F.",
+      "F, F, F, V.",
+      "F, F, V, V.",
+      "V, V, V, F."
+    ],
+    "ans": 1,
+    "explanation": "A sequência correta avaliada e pontuada na prova é F, V, V, F:\n1ª (Falsa): A revisão não deve ser enviesada para buscar apenas opiniões concordantes;\n2ª (Verdadeira): Conhecer a produção prévia impede a repetição desnecessária de trabalhos idênticos;\n3ª (Verdadeira): Mapear o estado da arte permite estruturar o cronograma e metodologia adequados;\n4ª (Falsa): A revisão bibliográfica mapeia e identifica onde estão as lacunas existentes; quem ultrapassa limites e preenche essas lacunas é a realização da pesquisa em si.",
+    "sources": [
+      "WhatsApp Image 2026-09-14 at 17.34.45 (2).jpeg"
+    ]
+  },
+  {
+    "n": 26,
+    "tp": "Etapas Iniciais do Projeto de Pesquisa",
+    "code": "",
+    "ctx": "Os primeiros passos para a elaboração de uma pesquisa científica envolvem a identificação do tema de pesquisa, a formulação do problema de estudo, o levantamento de hipóteses e a definição dos objetivos. Esses elementos correspondem a questionamentos como: O que pesquisar? O que fazer com o problema identificado? Quais são as possíveis explicações para o fenômeno observado? Para que vou desenvolver essa pesquisa?",
+    "q": "Com base nos seus conhecimentos, leia as proposições:\n\nI - Pode-se considerar como tema: \"Oleaginosas (grãos: feijão, lentilha, grão de bico, entre outras) provocam flatulências em humanos\".\nII - Pode-se considerar como problema: \"Como reduzir o desconforto abdominal nos humanos ao consumir as oleaginosas?\".\nIII - Pode-se considerar como conclusão: \"Avaliar os tipos de preparo nas oleaginosos (assar, deixar de molho antes de cozinhar e cozinhar no vapor) e o grau do desconforto abdominal após a ingestão de cada preparo\".\nIV - Pode-se considerar como experimentação: \"Levantar ideias sobre as possíveis causas do desconforto abdominal causado por flatulências\".\n\nÉ correto o que se afirma apenas em:",
+    "opts": [
+      "III e IV.",
+      "I e III.",
+      "I e II.",
+      "II e IV.",
+      "II e III."
+    ],
+    "ans": 2,
+    "explanation": "As proposições I e II estão corretas: o item I define adequadamente o tema/assunto delimitado, e o item II formula o problema científico em formato de pergunta norteadora. O item III descreve na verdade um objetivo/metodologia experimental (e não uma conclusão), e o item IV descreve o levantamento de hipóteses teóricas (e não a experimentação prática em si).",
+    "sources": [
+      "WhatsApp Image 2026-09-14 at 17.34.45 (4).jpeg"
+    ]
+  },
+  {
+    "n": 27,
+    "tp": "Formulação do Problema e Brainstorm",
+    "code": "",
+    "ctx": "Uma das principais etapas na elaboração de um projeto de pesquisa é a definição do problema a ser investigado. O problema de pesquisa irá direcionar o olhar do pesquisador para um assunto mais específico dentro do tema e é desenvolvido através da elaboração de uma pergunta, cuja resposta é o objetivo do projeto de pesquisa. Portanto, o problema é uma questão a ser investigada e várias hipóteses podem ser elaboradas na tentativa solucioná-lo.\n\nCom base nos seus conhecimentos sobre o desenvolvimento do projeto de pesquisa e a elaboração do problema, avalie as asserções a seguir e a relação proposta entre elas.",
+    "q": "I. O problema de um trabalho de pesquisa sempre vem de uma indagação sobre um assunto ou pode ser formulado para preencher uma lacuna teórica.\n\nPORQUE\n\nII. Brainstorm é uma técnica que auxilia na formulação de um problema.\n\nA respeito dessas asserções, assinale a opção correta:",
+    "opts": [
+      "A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.",
+      "As asserções I e II são proposições falsas.",
+      "A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.",
+      "As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I.",
+      "As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I."
+    ],
+    "ans": 2,
+    "explanation": "Resposta definida como correta: A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.\n\n• Asserção I (Verdadeira): O problema de um trabalho científico parte da indagação/questionamento sobre determinado tema ou da necessidade de preencher uma lacuna no conhecimento teórico existente.\n• Asserção II (Considerada Falsa): Considera-se que o brainstorm (tempestade de ideias) atua primordialmente na geração livre de ideias e hipóteses, e não como instrumento formal para a elaboração e delimitação precisa do problema científico.",
+    "sources": [
+      "WhatsApp Image 2026-09-14 at 21.43.36.jpeg",
+      "Avaliação Virtual - Iniciação a Pesquisa Científica (Pergunta 4)"
+    ]
+  },
+  {
+    "n": 28,
+    "tp": "Método Científico e Hipóteses de Pesquisa",
+    "code": "",
+    "ctx": "Uma hipótese é uma afirmação que introduz uma questão de pesquisa e propõe um resultado esperado. É parte integrante do método científico que forma a base de experimentos científicos. Portanto, você precisa ser cuidadoso ao construir sua hipótese. (Disponível em: https://www.escreverciencia.com/, Acesso em 13 jun. 2023).",
+    "q": "Qual é a finalidade das hipóteses levantadas durante a pesquisa científica?",
+    "opts": [
+      "Explorar possíveis respostas ou soluções para o problema de pesquisa.",
+      "Proporcionar um embasamento teórico para o desenvolvimento do projeto de pesquisa.",
+      "Identificar as variáveis envolvidas no problema de pesquisa.",
+      "Definir o objetivo geral e específico do projeto de pesquisa.",
+      "Oferecer uma solução final para o problema proposto no projeto de pesquisa."
+    ],
+    "ans": 0,
+    "explanation": "No método científico, as hipóteses têm como finalidade primordial propor respostas provisórias, plausíveis e testáveis à pergunta-problema formulada pelo pesquisador. Elas servem de guia para o direcionamento da coleta de dados e experimentação, sendo confirmadas ou refutadas ao longo do estudo (não constituindo a solução definitiva a priori).",
+    "sources": [
+      "WhatsApp Image 2026-09-14 at 21.43.37 (1).jpeg"
+    ]
+  },
+  {
+    "n": 29,
+    "tp": "Revisão Bibliográfica e Redução de Erros",
+    "code": "",
+    "ctx": "Realizar uma pesquisa bibliográfica faz parte do cotidiano de todos os estudantes e pesquisadores. É uma das tarefas que mais impulsionam nosso aprendizado e amadurecimento na área de estudo. Atualmente, as bibliotecas digitais têm facilitado e simplificado muito essa tarefa, pois trazem recursos de busca e cruzamento de informações que facilitam a vida de todos. (Disponível em: http://www.ufcg.edu.br/~historia/pet/index.php, Acesso em 11 jun. 2023).\n\nAvalie as asserções a seguir e a relação proposta entre elas.",
+    "q": "I - É auxílio para definição de caminhos a seguir, reduzindo possíveis erros e desvios.\n\nPORQUE\n\nII - Permite o conhecimento de questões ainda não respondidas que podem ser importantes para a pesquisa a ser realizada.\n\nA respeito dessas asserções, assinale a opção correta:",
+    "opts": [
+      "A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.",
+      "As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I.",
+      "As asserções I e II são proposições falsas.",
+      "As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.",
+      "A asserção I é uma proposição falsa, e a II é uma proposição verdadeira."
+    ],
+    "ans": 3,
+    "explanation": "Ambas as asserções são verdadeiras: a revisão bibliográfica orienta os passos metodológicos do pesquisador, prevenindo erros conceituais e duplicações (asserção I verdadeira), e possibilita vislumbrar as lacunas teóricas e perguntas ainda sem resposta na comunidade científica (asserção II verdadeira). No entanto, a proposição II não atua como justificativa lógica causal da asserção I (gabarito oficial: proposições verdadeiras, mas a II não é justificativa da I).",
+    "sources": [
+      "WhatsApp Image 2026-09-14 at 21.43.38.jpeg"
+    ]
+  },
+  {
+    "n": 30,
+    "tp": "Epistemologia e Justificação (Cornman, Lehrer, Pappas)",
+    "code": "",
+    "ctx": "Como poderemos distinguir o conhecimento da mera crença verdadeira? A maior parte dos filósofos, incluindo os cépticos, defende que a condição para se considerar a crença verdadeira como conhecimento tem a ver com a justificação que uma pessoa tem para acreditar naquilo em que acredita. (CORNMAN, LEHRER, PAPPAS. Philosophical Problems and Arguments: An introduction. New York: Macmillan Publishing Co., Inc., 1983, p. 42).\n\nA partir desta afirmação, analise as asserções a seguir e a relação proposta entre elas:",
+    "q": "I. A justificação se relaciona àquilo que indica os motivos para que a crença seja verdadeira, para que ela não seja apenas uma opinião sem fundamento.\n\nPORQUE\n\nII. Não é conhecimento quando se lança um dado, afirmando-se que vai cair o número três, e realmente sai o três.\n\nA respeito dessas asserções, assinale a opção correta:",
+    "opts": [
+      "As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.",
+      "A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.",
+      "As asserções I e II são proposições falsas.",
+      "A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.",
+      "As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I."
+    ],
+    "ans": 4,
+    "explanation": "Resposta definida como correta: As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I.\n\n• Asserção I (Verdadeira): A justificação epistêmica é a condição que fundamenta racionalmente a crença, impedindo que ela seja tratada como mera conjectura ou palpite sem base.\n• Asserção II (Verdadeira e Justificativa da I): O caso do lançamento do dado exemplifica e justifica a asserção I, pois evidencia que o acerto por puro acaso não constitui conhecimento genuíno, comprovando a necessidade imperativa de justificação racional.",
+    "sources": [
+      "WhatsApp Image 2026-09-14 at 22.03.28.jpeg"
+    ]
+  },
+  {
+    "n": 31,
+    "tp": "História da Ciência e Filosofia (Ciência e Religião)",
+    "code": "",
+    "ctx": "O distanciamento atual entre ciência e religião não foi sempre o caso ao longo da história da humanidade:\n\n\"No que concerne ao nosso problema, não há dúvida de que uma tradição religiosa claramente reconhecível e contínua exerceu uma influência poderosa nas teorias físicas do espaço, desde o século I até o século XVIII. Essa influência culminou na afirmação de que o espaço é um atributo de Deus. Para Newton, o espaço absoluto era o sensório (sensorium) de Deus; para More, era a extensão divina.\"\n\n(JAMMER, M. Conceitos de espaço: A história das teorias do espaço na física. Tradução de Vera Ribeiro. Rio de Janeiro: Contraponto, 2010, pp. 53-54).",
+    "q": "De acordo com as afirmações apresentadas acima:\n\n( ) A ciência sempre se submete à religião.\n( ) Apesar de alguns exemplos, teorias científicas quase nunca envolveram crenças religiosas.\n( ) More e Newton utilizavam a ciência para agradar líderes religiosos.\n( ) Algumas teorias científicas também envolviam crenças religiosas.\n( ) A ciência e a religião estiveram interligadas durante um longo tempo da história da ciência.\n\nA sequência correta, de cima para baixo, é:",
+    "opts": [
+      "V, F, V, F, F.",
+      "F, V, F, F, V.",
+      "F, F, F, V, V.",
+      "F, F, F, F, V.",
+      "V, V, V, V, F."
+    ],
+    "ans": 2,
+    "explanation": "A sequência correta é F, F, F, V, V:\n1ª (Falsa): A ciência não 'sempre se submete' à religião;\n2ª (Falsa): O texto afirma exatamente o oposto: tradições religiosas exerceram influência contínua e poderosa nas teorias do espaço do séc. I ao XVIII;\n3ª (Falsa): More e Newton concebiam o espaço fisicamente como atributo ou sensório divino em suas cosmologias, e não como manobra bajulatória a líderes religiosos;\n4ª (Verdadeira): As formulações clássicas da física do espaço incorporavam premissas teológicas e crenças religiosas;\n5ª (Verdadeira): Ciência e religião mantiveram vínculos profundos e interligados durante expressivo período da história da ciência.",
+    "sources": [
+      "WhatsApp Image 2026-09-14 at 22.03.29 (3).jpeg"
+    ]
+  },
+  {
+    "n": 32,
+    "tp": "Critérios de Seleção para Revisão Bibliográfica",
+    "code": "",
+    "ctx": "Nem toda publicação é útil ou importante para uma pesquisa, ainda que seja dentro do mesmo tema; por isso, a revisão bibliográfica deve se dar a partir de rigorosa seleção.",
+    "q": "O que deve ser considerado para uma boa revisão bibliográfica? Leia as proposições e atribua V ou F:\n\n( ) A relevância na área acadêmica e o número de vezes que um artigo é citado, além da reputação dos autores e periódicos.\n( ) Com base no tema, não importando quando ou quem escreveu determinado artigo.\n( ) Sempre artigos regionais, primando-se pela contextualização da pesquisa e sua importância social.\n( ) Apenas a atualidade das publicações não garante a validação da pesquisa.\n\nA sequência correta, de cima para baixo, é:",
+    "opts": [
+      "F, V, V, F.",
+      "V, V, V, F.",
+      "V, F, V, F.",
+      "V, F, F, V.",
+      "F, F, V, V."
+    ],
+    "ans": 3,
+    "explanation": "A sequência correta avaliada na prova é V, F, F, V:\n1ª (Verdadeira): Relevância acadêmica, citações acumuladas e prestígio de autores e periódicos são métricas consagradas de seleção;\n2ª (Falsa): A data de publicação e a autoria são fundamentais para avaliar autoridade, rigor e anacronismos;\n3ª (Falsa): Não se devem selecionar 'sempre artigos regionais', mas sim as publicações científicas de maior rigor e pertinência global ou local conforme o escopo do projeto;\n4ª (Verdadeira): A mera atualidade (artigo recente) não é garantia isolada de rigor metodológico ou solidez conceitual.",
+    "sources": [
+      "WhatsApp Image 2026-09-14 at 22.04.07 (2).jpeg"
+    ]
+  },
+  {
+    "n": 33,
+    "tp": "Princípios da Pesquisa Científica e Normas ABNT",
+    "code": "U032025.2LO-01M",
+    "ctx": "Em um mundo cada vez mais orientado pela informação, a capacidade de conduzir uma investigação organizada e fundamentada é uma competência indispensável para estudantes universitários, independentemente da área de conhecimento. A construção de um trabalho científico não se resume à escrita final, mas envolve etapas estratégicas que garantem rigor, clareza e originalidade. Desde a escolha do tema até a revisão bibliográfica e o cumprimento das normas técnicas, cada fase exige reflexão, planejamento e precisão. Compreender esses elementos é essencial para desenvolver pesquisas que contribuam de forma ética e significativa para o avanço do conhecimento.",
+    "q": "Com base nos princípios da pesquisa científica, analise as afirmativas a seguir:\n\nI. A escolha de um tema de pesquisa deve considerar não apenas o interesse pessoal, mas também sua viabilidade, relevância social, disponibilidade de tempo, base teórica existente e o conhecimento prévio do pesquisador sobre o assunto.\n\nII. O levantamento de hipóteses envolve a formulação de respostas provisórias e testáveis para o problema de pesquisa, podendo ser estimulado por técnicas criativas como o brainstorming.\n\nIII. A revisão bibliográfica deve priorizar fontes informais e de fácil acesso, como blogs, fóruns e sites de perguntas e respostas, pois essas plataformas oferecem atualização constante e diversidade de opiniões.\n\nIV. A ABNT NBR 14724:2011 define a estrutura formal de trabalhos acadêmicos, incluindo elementos pré-textuais, textuais e pós-textuais, além de normas específicas para formatação gráfica, como fonte, espaçamento e margens.\n\nÉ correto o que se afirma em:",
+    "opts": [
+      "I, III e IV, apenas.",
+      "II, III e IV, apenas.",
+      "I e II, apenas.",
+      "I e III, apenas.",
+      "II e IV, apenas."
+    ],
+    "ans": 4,
+    "explanation": "Resposta correta definida: II e IV, apenas.\n\n• Afirmativa II (Verdadeira): As hipóteses representam respostas provisórias e passíveis de teste empírico para o problema investigado, podendo ser geradas por técnicas criativas como o brainstorming.\n• Afirmativa IV (Verdadeira): A norma ABNT NBR 14724:2011 especifica os princípios gerais para elaboração e estrutura de trabalhos acadêmicos (elementos pré-textuais, textuais e pós-textuais) e regras de formatação (como margens, fontes e espaçamento).\n• Afirmativa III (Falsa): A revisão bibliográfica requer o levantamento criterioso em fontes científicas validadas (artigos acadêmicos revisados por pares, livros acadêmicos, periódicos indexados), e não a priorização de fontes informais como fóruns e blogs.",
+    "sources": [
+      "Avaliação Virtual - Iniciação a Pesquisa Científica (Código: U032025.2LO-01M)"
+    ]
+  },
+  {
+    "n": 34,
+    "tp": "Níveis de Leitura de Mortimer Adler",
+    "code": "",
+    "ctx": "Mas você sabia que existem quatro níveis de leitura que podem ser experimentados durante o processo? Esses diferentes níveis foram apresentados pelo grande intelectual americano Mortimer Adler em sua obra 'Como Ler Livros'.\n\nDisponível em: https://www.atenaeditora.com.br/blog/voce-conhece-os-4-niveis-de-leitura-de-mortimer-adler, Acesso em 11 jun. 2023.",
+    "q": "No processo de leitura especializada, qual é o segundo nível de leitura?",
+    "opts": [
+      "Nível de leitura analítica",
+      "Nível de leitura sintópica",
+      "Nível de leitura inspecional",
+      "Nível de leitura elementar",
+      "Nível de leitura dinâmica"
+    ],
+    "ans": 2,
+    "explanation": "De acordo com Mortimer Adler na obra 'Como Ler Livros', a leitura estrutura-se em 4 níveis progressivos:\n1º nível: Leitura elementar (alfabetização e decodificação básica);\n2º nível: Leitura inspecional (exame superficial sistemático para extrair o máximo do livro no tempo delimitado);\n3º nível: Leitura analítica (leitura minuciosa e completa para compreensão aprofundada);\n4º nível: Leitura sintópica (leitura comparativa entre múltiplas obras sobre um tema comum).",
+    "sources": [
+      "Avaliação Virtual - Iniciação a Pesquisa Científica (Pergunta 2)"
+    ]
+  },
+  {
+    "n": 35,
+    "tp": "Citações e Metodologia Científica (Direta vs. Indireta)",
+    "code": "U032024.2LL-01M",
+    "ctx": "No campo da metodologia científica, a correta utilização de citações é fundamental para garantir a integridade acadêmica e o rigor na construção do conhecimento. A escolha entre citação direta e indireta depende de diversos fatores, incluindo a intenção do pesquisador, a natureza do texto original, e o contexto em que a citação é empregada. Avalie as asserções a seguir e a relação proposta entre elas.",
+    "q": "I. A citação indireta permite ao pesquisador integrar o conteúdo do texto original de maneira mais fluida em seu próprio texto, contribuindo para uma maior coesão argumentativa e originalidade na apresentação das ideias.\n\nPORQUE\n\nII. A citação direta, ao transcrever literalmente as palavras do autor original, limita a interpretação e adaptação do conteúdo ao contexto específico da pesquisa em desenvolvimento.\n\nA respeito dessas asserções, assinale a opção correta:",
+    "opts": [
+      "A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.",
+      "As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.",
+      "A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.",
+      "As asserções I e II são proposições falsas.",
+      "As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I."
+    ],
+    "ans": 1,
+    "explanation": "Resposta definida como correta: As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.\n\n• Asserção I (Verdadeira): A citação indireta (paráfrase) possibilita incorporar as formulações do texto fonte adaptando-as com naturalidade ao estilo da redação, o que enriquece a fluidez, a coesão discursiva e a identidade autoral do trabalho.\n• Asserção II (Verdadeira): A citação direta é a reprodução literal do trecho, o que naturalmente restringe a maleabilidade interpretativa e a acomodação estilística do texto ao encadeamento específico do pesquisador.\n• Relação entre as asserções: Embora ambas sejam constatações verídicas sobre o papel de cada modalidade de citação, a asserção II não constitui a justificativa ou explicação causal da asserção I.",
+    "sources": [
+      "Avaliação Virtual - Iniciação a Pesquisa Científica (Código: U032024.2LL-01M - Pergunta 4)"
+    ]
+  },
+  {
+    "code": "U042024.2LL-01M",
+    "tp": "Ética e Integridade Científica (Plágio e Autoplágio)",
+    "ctx": "No ambiente acadêmico, a originalidade e a integridade são valores essenciais. Além do plágio, que é o uso não autorizado de ideias ou textos de outros, existe também o autoplágio, que ocorre quando um autor reutiliza seu próprio trabalho anterior sem dar a devida referência. Para evitar essas práticas e garantir a ética na pesquisa, é necessário adotar medidas preventivas e boas práticas de escrita. Neste contexto, leia o parágrafo abaixo e assinale a alternativa correta:\n\nJoana está revisando seu artigo científico e quer garantir que não incorra em plágio nem em autoplágio.",
+    "q": "Qual das seguintes práticas é a mais adequada para evitar essas infrações e assegurar a integridade de seu trabalho?",
+    "opts": [
+      "Consultar apenas uma ferramenta de detecção de plágio, confiando que será suficiente.",
+      "Citar todas as fontes de onde retirou informações e ideias, inclusive quando utiliza suas próprias publicações anteriores.",
+      "Reescrever partes de artigos anteriores de forma ligeiramente diferente para parecerem novas contribuições.",
+      "Parafrasear trechos de artigos de outros autores sem citar a fonte, pois não está copiando diretamente.",
+      "Usar trechos de seus trabalhos anteriores sem referência, já que é a autora original."
+    ],
+    "ans": 1,
+    "explanation": "A conduta ética fundamental na redação acadêmica exige a referenciação rigorosa de todas as fontes consultadas. Isso inclui os próprios trabalhos anteriores do autor (para evitar o autoplágio ou reaproveitamento não declarado) e as obras de terceiros, mesmo quando parafraseadas. Softwares de plágio são apenas ferramentas auxiliares e não substituem o rigor metodológico.",
+    "sources": [
+      "Angelina Aparecida de Aguiar Souza - Iniciação a Pesquisa Científica - Universidade São Francisco.pdf (Pág 2)",
+      "Emilly Rodrigues - atividade 4 Iniciação a Pesquisa Científica - Universidade São Francisco.pdf (Pág 4)",
+      "atividade 02.pdf (Pág 3 - Pergunta 4)"
+    ],
+    "n": 36
+  },
+  {
+    "code": "U042024.2LL-02F",
+    "tp": "Estrutura do Artigo Científico (Dados, Anexos/Apêndices e Cronograma)",
+    "ctx": "Na elaboração de um artigo científico, é crucial a apresentação clara e adequada dos dados, que podem ser qualitativos ou quantitativos. Além disso, compreender a diferença entre apêndice e anexo e a importância de um cronograma de pesquisa são fundamentais para a estruturação e organização do trabalho.\n\nConsidere as seguintes afirmativas sobre a apresentação de dados qualitativos e quantitativos em um artigo científico, diferenças entre apêndice e anexo e cronograma de pesquisa:\n\nI. Dados qualitativos são geralmente apresentados por meio de tabelas, gráficos e estatísticas descritivas.\nII. Dados quantitativos são frequentemente apresentados por meio de descrições detalhadas, citações diretas e análises temáticas.\nIII. Apêndices são utilizados para incluir materiais que foram produzidos pelo próprio autor e que complementam o texto principal.\nIV. Anexos são usados para incorporar documentos que não foram elaborados pelo autor, mas que são relevantes para a pesquisa.\nV. O cronograma de pesquisa detalha as etapas e o tempo previsto para a realização de cada uma, ajudando no planejamento e execução do projeto.",
+    "q": "É correto o que se afirma em:",
+    "opts": [
+      "I e II.",
+      "III e IV, apenas.",
+      "I, III e IV.",
+      "II, IV e V.",
+      "III, IV e V."
+    ],
+    "ans": 4,
+    "explanation": "Análise das afirmativas:\n• I é FALSA e II é FALSA: os conceitos estão invertidos. Dados quantitativos utilizam tabelas, gráficos e estatística descritiva; dados qualitativos apoiam-se em descrições aprofundadas, citações diretas e análise temática ou de conteúdo.\n• III é VERDADEIRA: conforme a ABNT NBR 14724, apêndice é elemento elaborado pelo próprio autor para complementar o texto.\n• IV é VERDADEIRA: anexo é documento não elaborado pelo autor, servindo para fundamentação ou comprovação.\n• V é VERDADEIRA: o cronograma planeja e organiza a distribuição temporal das atividades de pesquisa.",
+    "sources": [
+      "Iniciação a Pesquisa Científica 4.pdf (Pág 1 - Pergunta 2)",
+      "UNID4.pdf (Pág 5 - Pergunta 5)",
+      "WhatsApp Image 2026-09-24 at 16.09.00 (1).jpeg",
+      "WhatsApp Image 2026-09-25 at 15.49.13.jpeg"
+    ],
+    "n": 37
+  },
+  {
+    "code": "U042025.2LL-01F",
+    "tp": "Comunicação Científica e Apresentação de Trabalhos (Pôster e Resumo)",
+    "ctx": "Na componente curricular de Trabalho de Conclusão de Curso (TCC), os alunos foram orientados a submeter seus artigos científicos para um congresso científico. Durante a preparação, perceberam a importância de compreender as normas de estruturação do texto, a forma correta de elaborar o resumo, bem como a padronização de citações e referências. Além disso, discutiram a melhor forma de apresentação do estudo: pôster, resumo expandido ou comunicação oral.",
+    "q": "Com base nos princípios de elaboração e apresentação de trabalhos científicos, assinale a alternativa correta:",
+    "opts": [
+      "A comunicação oral em eventos científicos não exige síntese, pois permite apresentar todo o conteúdo da pesquisa na íntegra.",
+      "O resumo acadêmico deve ser escrito em primeira pessoa e conter opiniões pessoais do autor sobre os resultados da pesquisa.",
+      "O pôster científico deve apresentar de forma visual e resumida os pontos centrais da pesquisa, como introdução, objetivos, metodologia, resultados e conclusão.",
+      "As referências bibliográficas podem ser organizadas de forma livre, desde que apresentem autor, título e ano de publicação.",
+      "A introdução de um artigo deve apresentar apenas a fundamentação teórica, sem a necessidade de justificar a relevância do estudo."
+    ],
+    "ans": 2,
+    "explanation": "O pôster acadêmico/científico é uma modalidade de comunicação visual e sucinta que sintetiza as etapas essenciais da pesquisa (introdução, objetivos, metodologia, resultados e conclusões) em layout atrativo e legível à distância. As demais opções contêm erros conceituais graves: comunicação oral exige síntese rigorosa do tempo; resumos exigem terceira pessoa e impessoalidade (ABNT NBR 6028); referências seguem padronização rígida (ABNT NBR 6023); e a introdução deve obrigatoriamente justificar a relevância do estudo.",
+    "sources": [
+      "- Iniciação a Pesquisa Científica -.pdf (Pág 2 - Pergunta 2)",
+      "atividade 02.pdf (Pág 4 - Pergunta 5)",
+      "WhatsApp Image 2026-09-24 at 09.07.09.jpeg",
+      "WhatsApp Image 2026-09-25 at 15.48.19.jpeg"
+    ],
+    "n": 38
+  },
+  {
+    "code": "U042025.2LL-02M",
+    "tp": "Normatização e Comunicação em Congressos Científicos (ABNT e Apresentações)",
+    "ctx": "Um grupo de estudantes de diferentes cursos decidiu participar de um congresso acadêmico com um trabalho em forma de artigo científico. Durante o processo, eles enfrentaram dúvidas sobre como estruturar corretamente o texto, respeitar normas de padronização, utilizar citações de forma adequada e elaborar referências segundo critérios acadêmicos. Além disso, precisaram compreender as diferenças entre resumos, pôsteres e comunicações orais para escolher a melhor forma de apresentação do estudo.\n\nCom base nos princípios de estruturação, padronização e divulgação do trabalho científico, analise as afirmativas a seguir e classifique-as como V para as verdadeiras e F para as falsas:\n\n( ) A introdução de um artigo deve apresentar a temática investigada, justificar sua relevância e expor os objetivos do estudo.\n( ) As normas da ABNT definem critérios para citações diretas, indiretas e referências, garantindo uniformidade e rigor acadêmico.\n( ) O resumo simples deve conter apenas os resultados da pesquisa, sem necessidade de apresentar objetivo ou metodologia.\n( ) A comunicação oral em eventos científicos exige, além do domínio do conteúdo, a capacidade de síntese e clareza para respeitar o tempo disponível.\n( ) O pôster acadêmico é uma modalidade de apresentação que privilegia a exposição detalhada de todo o texto da pesquisa, incluindo introdução, fundamentação teórica e discussão completa.",
+    "q": "A sequência correta, de cima para baixo, é:",
+    "opts": [
+      "F – F – F – V – V.",
+      "V – V – F – F – V.",
+      "V – F – F – V – F.",
+      "F – V – V – V – F.",
+      "V – V – F – V – F."
+    ],
+    "ans": 4,
+    "explanation": "Classificação das afirmativas:\n• 1ª (V): A introdução deve contextualizar o tema, justificar sua relevância e apresentar claramente os objetivos.\n• 2ª (V): As normas ABNT (NBR 10520, NBR 6023 etc.) estabelecem critérios para citações e referências, conferindo rigor e uniformidade.\n• 3ª (F): Conforme a NBR 6028, o resumo acadêmico deve conter objetivo, método, resultados e conclusões, não apenas resultados.\n• 4ª (V): Apresentações orais dispõem de tempo rígido e pré-estabelecido, demandando alta síntese e clareza.\n• 5ª (F): O pôster privilegia o resumo visual e esquemático, não o texto completo e detalhado na íntegra.",
+    "sources": [
+      "Iniciacao_Pesquisa_Cientifica_Questionario_4.pdf (Pág 3 - Pergunta 4)",
+      "Iniciação a Pesquisa Científica - Quinzena 4.pdf (Pág 3 - Pergunta 3)",
+      "WhatsApp Image 2026-09-24 at 08.49.16.jpeg"
+    ],
+    "n": 39
+  },
+  {
+    "code": "",
+    "tp": "Organização e Apresentação de Dados (Tabelas)",
+    "ctx": "Em resumo, dados são valores atribuídos a algo. Estes valores não precisam ser necessariamente números. Eles também podem ser, por exemplo, conceitos ou posições em um mapa. Dados podem ser medidos ou mensurados por meio de instrumentos, mas também podem ser atribuídos de forma arbitrária. (Disponível em: https://escoladedados.org/tutoriais/o-que-sao-dados/, Acesso em 15 jun. 2023).",
+    "q": "Qual é a principal ferramenta utilizada para apresentar um universo de dados em pesquisa?",
+    "opts": [
+      "Questionários",
+      "Tabelas",
+      "Entrevistas",
+      "Gráficos",
+      "Categorização"
+    ],
+    "ans": 1,
+    "explanation": "Na metodologia de pesquisa e estatística, a tabela é a ferramenta primordial para compilar, organizar e apresentar a totalidade ou um universo amplo de dados coletados em formato estruturado (linhas e colunas com valores e variáveis). Os gráficos servem para ilustrar tendências e comparações pontuais de frações desses dados, enquanto questionários e entrevistas são técnicas de coleta.",
+    "sources": [
+      "atividade 02.pdf (Pág 2 - Pergunta 2)",
+      "UNID4.pdf (Pág 3 - Pergunta 3)",
+      "Gabrielle - Iniciação a Pesquisa Científica - Unidade 4.pdf (Pág 3 - Pergunta 4)",
+      "WhatsApp Image 2026-09-24 at 08.55.00 (1).jpeg"
+    ],
+    "n": 40
+  },
+  {
+    "code": "",
+    "tp": "Representação Visual de Séries Temporais e Tendências (Gráficos)",
+    "ctx": "Quando reunimos dados antigos e os usamos para projetar resultados futuros, estamos a fazer a preparação para a análise de tendências. Uma linha de tendência está sempre associada a uma série de dados, mas uma linha de tendência não representa os dados dessa série. (Disponível em: https://www.portal-gestao.com/blog/789800-como-usar-linhas-de-tend%C3%AAncia-para-previs%C3%A3o-de-dados.html, Acesso em 15 jun. 2023).",
+    "q": "Qual é a forma visual de apresentação de dados que ajuda a demonstrar tendências difíceis de observar apenas pelos valores?",
+    "opts": [
+      "Questionários",
+      "Tabelas",
+      "Entrevistas",
+      "Gráficos",
+      "Categorização"
+    ],
+    "ans": 3,
+    "explanation": "Os gráficos são representações visuais ideais para evidenciar o comportamento e tendências de uma série de dados (como séries temporais, crescimento, declínio, sazonalidade), permitindo uma percepção intuitiva e imediata de padrões que seriam difíceis de identificar examinando apenas tabelas com longas sequências numéricas.",
+    "sources": [
+      "Emilly Rodrigues - atividade 4 Iniciação a Pesquisa Científica - Universidade São Francisco.pdf (Pág 1 - Pergunta 1)",
+      "Gabrielle - Iniciação a Pesquisa Científica - Unidade 4.pdf (Pág 1 - Pergunta 1)",
+      "Unidade 4 - Iniciação a Pesquisa Científica - Universidade São Francisco.pdf (Pág 4 - Pergunta 4)",
+      "WhatsApp Image 2026-09-24 at 09.01.16.jpeg"
+    ],
+    "n": 41
+  },
+  {
+    "code": "",
+    "tp": "Metodologia de Apresentação de Resultados (Função dos Gráficos)",
+    "ctx": "Gráficos de pesquisa são extremamente úteis na apresentação de resultados de um trabalho de pesquisa, mas é necessário ter um cuidado no momento de escolher para transmitir a mensagem correta e clara ao leitor do trabalho. (Disponível em: https://biblio.direito.ufmg.br/?p=3861, Acesso em 15 jun. 2023).",
+    "q": "Em uma pesquisa científica, gráficos servem apenas para...",
+    "opts": [
+      "convencer o leitor com relação a argumentos de base numérica.",
+      "apresentar resultados na área de exatas.",
+      "transformar textos em tabelas.",
+      "deixar o entendimento de números mais facilitado.",
+      "demonstrar determinados tipos de dados."
+    ],
+    "ans": 4,
+    "explanation": "Na metodologia científica, gráficos não devem ser usados indiscriminadamente para todo e qualquer número ou para simplesmente 'enfeitar' o trabalho. Cada gráfico (linhas, barras, setores, histograma) serve especificamente para demonstrar determinados tipos de dados e relações específicas (proporções, evolução temporal, dispersão etc.), segundo a natureza dos dados.",
+    "sources": [
+      "atividade 02.pdf (Pág 1 - Pergunta 1)",
+      "Iniciação a Pesquisa Científica 4.pdf (Pág 1 - Pergunta 1)",
+      "WhatsApp Image 2026-09-24 at 11.37.12.jpeg",
+      "WhatsApp Image 2026-09-24 at 16.09.00 (3).jpeg"
+    ],
+    "n": 42
+  },
+  {
+    "code": "",
+    "tp": "Metodologia de Coleta de Dados (Pesquisa Qualitativa)",
+    "ctx": "Embora os dados qualitativos e quantitativos sejam diferentes nos métodos utilizados para descrever e observar o mundo ao redor, eles fornecem conhecimentos igualmente valiosos para descrever indivíduos e fornecer informações úteis sobre eles. (Disponível em: https://psicoativo.com/2016/08/diferenca-entre-dados-qualitativos-e-dados-quantitativos.html, Acesso em 15 jun. 2023).",
+    "q": "Como os dados qualitativos são obtidos em pesquisas?",
+    "opts": [
+      "Utilizando categorias predefinidas com base em dados obtidos anteriormente.",
+      "Realizando análises estatísticas avançadas para avaliar as diferenças entre grupos.",
+      "Comparando as respostas com informações estabelecidas a priori por sites de viagem.",
+      "Por meio de entrevistas ou questionários onde o entrevistado elabora verbalmente sua opinião ou percepção sobre um assunto.",
+      "Através de medições com equipamentos específicos."
+    ],
+    "ans": 3,
+    "explanation": "Os dados qualitativos são de natureza subjetiva, descritiva e textual, coletados essencialmente por meio de entrevistas (abertas ou semiestruturadas), grupos focais, observação participante ou questionários de perguntas abertas, nos quais os participantes expressam livremente suas percepções, opiniões, sentimentos e vivências em suas próprias palavras.",
+    "sources": [
+      "atividade 02.pdf (Pág 2 - Pergunta 3)",
+      "Rosiane Cristina dos Santos - Iniciação a Pesquisa Científica - Universidade São Francisco.pdf (Pág 4 - Pergunta 5)",
+      "Emilly Rodrigues - atividade 4 Iniciação a Pesquisa Científica - Universidade São Francisco.pdf (Pág 4 - Pergunta 4)",
+      "WhatsApp Image 2026-09-24 at 09.09.40.jpeg"
+    ],
+    "n": 43
+  },
+  {
+    "code": "",
+    "tp": "Tipologia de Plágio Acadêmico (Plágio Direto)",
+    "ctx": "Um estudante estava sem tempo e sem criatividade para dar conta de todos os trabalhos acadêmicos que tinha para o fim do semestre letivo. Tendo de escrever três tópicos sobre o tema, e acreditando que não seria identificado, ele resolve pegar um livro e copiar um tópico para o texto de seu trabalho.",
+    "q": "Qual tipo de plágio ocorreu neste caso?",
+    "opts": [
+      "plágio completo",
+      "plágio integral",
+      "plágio direto",
+      "autoplágio",
+      "plágio indireto"
+    ],
+    "ans": 2,
+    "explanation": "O plágio direto (ou textual) ocorre quando há a transcrição literal (ipsis litteris), cópia palavra por palavra, de trecho, tópico ou frase de outro autor sem a utilização de aspas (ou recuo para citações longas) e sem o devido crédito à fonte original. Difere do plágio integral (cópia da obra inteira) e do plágio indireto (paráfrase não creditada).",
+    "sources": [
+      "Gabrielle - Iniciação a Pesquisa Científica - Unidade 4.pdf (Pág 2 - Pergunta 2)",
+      "Emilly Rodrigues - atividade 4 Iniciação a Pesquisa Científica - Universidade São Francisco.pdf (Pág 2 - Pergunta 2)",
+      "Iniciação a Pesquisa Científica - Quinzena 4.pdf (Pág 4 - Pergunta 4)",
+      "WhatsApp Image 2026-09-24 at 09.02.26.jpeg",
+      "WhatsApp Image 2026-09-24 at 16.09.00 (2).jpeg"
+    ],
+    "n": 44
+  },
+  {
+    "code": "",
+    "tp": "Legislação e Direitos Autorais na Pesquisa (Artigo 184 do Código Penal)",
+    "ctx": "Segundo o Artigo 184 do Código Penal, a \"[…] reprodução total ou parcial, com intuito de lucro direto ou indireto, por qualquer meio ou processo, de obra intelectual, interpretação, execução ou fonograma, sem autorização expressa do autor, do artista intérprete ou executante, do produtor, conforme o caso, ou de quem os represente\" (parágrafo 1º) constitui crime contra a propriedade intelectual e a pena pode ser a reclusão de 3 (três) meses a 1 (um) ano ou multa.\n\nCom relação aos direitos autorais e o plágio, leia as afirmações abaixo e avalie se são verdadeiras (V) ou falsas (F):\n\n( ) Os direitos autorais podem não pertencer ao autor da obra.\n( ) Uma obra sem direitos autorais pode ser plagiada livremente.\n( ) Quando se utiliza um material (texto, tabela, imagem, música, etc.) de outro autor deve-se referenciar o autor original.\n( ) Quando se utiliza um material (texto, tabela, imagem, música, etc.) de outro autor deve-se referenciar o dono do direito autoral.\n( ) Os direitos autorais sempre pertencem ao autor.",
+    "q": "A sequência correta, de cima para baixo, é:",
+    "opts": [
+      "V - F - V - F - F",
+      "V - V - V - V - F",
+      "V - F - V - V - F",
+      "V - V - F - V - V",
+      "F - F - V - V - V"
+    ],
+    "ans": 0,
+    "explanation": "Análise das afirmações:\n• 1ª (V): Os direitos patrimoniais podem ser cedidos a terceiros (editoras, empregadores, instituições), logo podem não pertencer ao autor criador.\n• 2ª (F): Nenhuma obra pode ser plagiada, nem mesmo as em domínio público; a atribuição de autoria (direito moral) é perpétua.\n• 3ª (V): O crédito acadêmico é sempre conferido ao autor criador intelectual original.\n• 4ª (F): A referência acadêmica (normas ABNT) indica a autoria intelectual da obra, e não eventuais cessionários patrimoniais de direitos autorais.\n• 5ª (F): Falsa, pois os direitos autorais patrimoniais podem ser transferidos, não pertencendo sempre ao autor.",
+    "sources": [
+      "Iniciação a Pesquisa Científica - m4e.pdf (Pág 1-2 - Pergunta 1, Nota 1,5/1,5)",
+      "- Iniciação a Pesquisa Científica -.pdf (Pág 5)",
+      "WhatsApp Image 2026-09-24 at 11.37.12 (1).jpeg"
+    ],
+    "n": 45
+  },
+  {
+    "code": "",
+    "tp": "Ética em Pesquisa Científica (Conceito de Autoplágio)",
+    "ctx": "Se você não sabia, o autoplagio está entre os 10 tipos de plágios mais frequentes dentro e fora das universidades, isso porque são muito difíceis de se identificar. Mas com o tempo novos métodos e ferramentas estão sendo utilizadas para ajudar no processo de identificação. (Disponível em: https://www.voitto.com.br/blog/artigo/o-que-e-autoplagio, Acesso em 15 jun. 2023).",
+    "q": "O que é autoplágio? Assinale a alternativa correta.",
+    "opts": [
+      "A cópia de uma parte inteira de uma obra sem alterações.",
+      "A reprodução integral de uma obra sem modificações.",
+      "A adaptação e alteração de um texto original sem citação.",
+      "A reprodução parcial de uma obra com a devida citação.",
+      "O reaproveitamento de uma obra anterior em outra situação."
+    ],
+    "ans": 4,
+    "explanation": "O autoplágio consiste na reutilização ou reaproveitamento total ou substancial de trabalhos, dados ou publicações anteriores de autoria da própria pessoa em uma nova publicação ou entrega acadêmica, sem a devida citação explícita ou indicação de que aquele conteúdo já fora publicado anteriormente.",
+    "sources": [
+      "Iniciação a Pesquisa Científica 4.pdf (Pág 1 - Pergunta 5)",
+      "Rosiane Cristina dos Santos - Iniciação a Pesquisa Científica - Universidade São Francisco.pdf (Pág 3 - Pergunta 4)",
+      "Scanned PDF: IniciaÃ§Ã£o e pesquisa cientifica NOTA 0,09 Atividade 4.pdf"
+    ],
+    "n": 46
+  },
+  {
+    "code": "",
+    "tp": "Detecção de Plágio e Práticas Textuais Indevidas (Análise V/F)",
+    "ctx": "Há inúmeras ferramentas para detecção de plágio; veja o anúncio abaixo:\n\n“Verificamos o plágio usando IA avançada para detectar até mesmo as menores variações no texto. Nosso detector de plágio pode encontrar caracteres ocultos, paráfrases e conteúdo gerado por IA.” (Disponível em: https://copyleaks.com/pt/plagiarism-checker?utm_source=g, Acesso em 15 jun. 2023).\n\nSobre o plágio, leia as proposições e atribua V ou F:\n( ) A cópia de partes de uma obra sem ser feita a citação.\n( ) A adaptação e alteração de um texto original sem citação.\n( ) A utilização de atalhos de teclado para copiar e colar.\n( ) A reprodução total ou parcial de uma obra sem alterações.\n( ) A criação de um novo documento a partir de material disponível para copiar/colar.",
+    "q": "A sequência correta, de cima para baixo, é:",
+    "opts": [
+      "F, V, F, V, V.",
+      "F, F, F, V, V.",
+      "V, F, V, F, V.",
+      "V, V, V, F, F.",
+      "V, V, F, V, F."
+    ],
+    "ans": 4,
+    "explanation": "Classificação das proposições:\n• 1ª (V): Copiar partes de obra alheia sem citação é a forma mais evidente de plágio.\n• 2ª (V): Paráfrase ou adaptação de texto sem referenciar o autor da ideia original configura plágio de conceito/ideia.\n• 3ª (F): A ação mecânica de usar atalhos de teclado (Ctrl+C / Ctrl+V) em si não é plágio, mas sim a falta de citação de fontes.\n• 4ª (V): A reprodução (total ou parcial) sem as devidas aspas/citações/autorizações é plágio.\n• 5ª (F): Criar um documento novo utilizando ferramentas técnicas não é por si só plágio, desde que respeitadas as normas e referências.",
+    "sources": [
+      "Iniciacao_Pesquisa_Cientifica_Questionario_4.pdf (Pág 4 - Pergunta 5 - Gabarito ✓ V, V, F, V, F.)",
+      "- Iniciação a Pesquisa Científica -.pdf (Pág 4)",
+      "Maria Vitória Ferreira Silva - Iniciação a Pesquisa Científica - Universidade São Francisco.pdf",
+      "Iniciação a Pesquisa Científica - m4e.pdf (Pág 3)"
+    ],
+    "n": 47
+  },
+  {
+    "code": "",
+    "tp": "Normas ABNT NBR 10520 (Regras para Citação Direta)",
+    "ctx": "[Uma citação direta] gera mais respaldo e confiabilidade, visto que o leitor poderá ver que a sua pesquisa científica não foi escrita a partir somente de “ideias”, e sim de teoria comprovada por autores renomados. (Disponível em: https://www.normasabnt.org/citacao-direta/, Acesso em 15 jun. 2023).",
+    "q": "A forma correta de utilizar uma citação direta segundo as normas de produção de texto, é...",
+    "opts": [
+      "copiando um fragmento de texto, colocando referência no final, sem a necessidade de utilizar aspas.",
+      "copiando um fragmento de texto, colocando referência no final e utilizando aspas.",
+      "utilizando citações diretas apenas em textos literários.",
+      "evitando o uso de texto direto, pois afeta a originalidade do texto.",
+      "reformulando o texto original sem citar a fonte."
+    ],
+    "ans": 1,
+    "explanation": "De acordo com a ABNT NBR 10520, a citação direta curta (de até três linhas) deve ser inserida no corpo do texto entre aspas duplas, acompanhada do crédito da fonte (autor, ano, página). Se ultrapassar três linhas, deve vir em parágrafo destacado com recuo de 4 cm da margem esquerda, tamanho de fonte menor e sem aspas.",
+    "sources": [
+      "- Iniciação a Pesquisa Científica -.pdf (Pág 1 - Pergunta 1)",
+      "Questionário 4. Estatistica e pesquisa e inciação científica.pdf",
+      "WhatsApp Image 2026-09-24 at 12.05.32.jpeg"
+    ],
+    "n": 48
+  },
+  {
+    "code": "",
+    "tp": "Elementos Pós-Textuais (Apêndices e Anexos segundo a ABNT NBR 14724)",
+    "ctx": "Anexo e apêndice são elementos pós-textuais que fazem parte dos trabalhos de pesquisa. Ambos são utilizados para complementar ou comprovar a argumentação do texto. (Disponível em: https://www.significados.com.br/anexo-e-apendice/, Acesso em 15 jun. 2023).\n\nSobre apêndices e anexos, analise as proposições:\nI. Ambos devem ser da própria autoria de quem escreve a pesquisa.\nII. Ambos trazem apenas informações alheias ao trabalho de pesquisa.\nIII. Ambos devem aparecer no sumário.\nIV. Os anexos não são da autoria do próprio pesquisador.",
+    "q": "É correto o que se afirma apenas em:",
+    "opts": [
+      "I e II, apenas.",
+      "I e III, apenas.",
+      "I, II e III, apenas.",
+      "II e IV, apenas.",
+      "III e IV, apenas."
+    ],
+    "ans": 4,
+    "explanation": "Conforme a norma ABNT NBR 14724:\n• I é FALSA: apenas os apêndices são elaborados pelo autor da pesquisa; os anexos são de terceiros.\n• II é FALSA: não são 'alheias', trazem informações complementares ou comprobatórias diretamente vinculadas ao trabalho.\n• III é VERDADEIRA: tanto apêndices quanto anexos são elementos pós-textuais e devem constar no sumário (identificados por letras maiúsculas: APÊNDICE A – ..., ANEXO A – ...).\n• IV é VERDADEIRA: anexos são documentos não elaborados pelo pesquisador.",
+    "sources": [
+      "Edineia Soares de Sousa - Iniciação a Pesquisa Científica - Universidade São Francisco.pdf4.pdf (Pág 3 - Pergunta 3)",
+      "Iniciação a Pesquisa Científica - Quinzena 4.pdf (Pág 1 - Pergunta 1)",
+      "WhatsApp Image 2026-09-24 at 11.37.12 (2).jpeg",
+      "WhatsApp Image 2026-09-24 at 17.32.40 (2).jpeg"
+    ],
+    "n": 49
+  },
+  {
+    "code": "",
+    "tp": "Diferenças Normativas entre Apêndices e Anexos (V/F)",
+    "ctx": "É importante o uso de apêndices e anexos em um documento porque eles ajudam a esclarecer o corpo principal do documento e a fornecer informações mais detalhadas. Eles também ajudam a garantir que todos os documentos relacionados sejam incluídos no documento.\n\nCom relação às diferenças entre apêndices e anexos, leia as afirmações abaixo e avalie se são verdadeiras (V) ou falsas (F):\n( ) Os apêndices são textos elaborados pelos autores do trabalho e devem ser colocados após as referências bibliográficas.\n( ) Os anexos são textos que não são de autoria dos autores e são adicionados ao documento antes dos apêndices.\n( ) Deve-se tomar cuidado e evitar o uso de materiais protegidos por copyright nos anexos.\n( ) A ABNT possui formatação específica para apêndices e anexos.\n( ) A diferenciação entre apêndices e anexos é universal.",
+    "q": "A sequência correta, de cima para baixo, é:",
+    "opts": [
+      "V - V - V - V - F",
+      "V - F - V - F - V",
+      "V - F - V - V - F",
+      "F - F - V - V - V",
+      "V - V - F - V - F"
+    ],
+    "ans": 2,
+    "explanation": "Avaliação das afirmativas:\n• 1ª (V): Apêndices são elaborados pelos próprios autores e se localizam na parte pós-textual, após as referências.\n• 2ª (F): Anexos vêm DEPOIS dos apêndices na ordem da NBR 14724 (Referências -> Glossário -> Apêndice -> Anexo), e não antes.\n• 3ª (V): O uso de material de terceiros em anexos deve respeitar rigorosamente os direitos autorais e copyright.\n• 4ª (V): A ABNT padroniza sua formatação (NBR 14724) com letras maiúsculas consecutivas, travessão e títulos respectivos.\n• 5ª (F): Essa separação estrita entre 'apêndice' e 'anexo' é uma particularidade das normas brasileiras (ABNT); em convenções internacionais (como APA e Chicago), o termo 'Appendix' abrange ambas as funções.",
+    "sources": [
+      "Angelina Aparecida de Aguiar Souza - Iniciação a Pesquisa Científica - Universidade São Francisco.pdf (Pág 1 - Pergunta 1)",
+      "Edineia Soares de Sousa - Iniciação a Pesquisa Científica - Universidade São Francisco.pdf4.pdf (Pág 4)",
+      "WhatsApp Image 2026-09-24 at 13.10.32 (3).jpeg",
+      "WhatsApp Image 2026-09-24 at 16.09.00.jpeg"
+    ],
+    "n": 50
+  },
+  {
+    "code": "",
+    "tp": "Planejamento e Gestão de Pesquisa (Cronograma e Desenho Experimental)",
+    "ctx": "O cronograma de pesquisa envolve a organização do tempo e o encadeamento das etapas de construção da investigação. Quanto mais detalhada a organização do cronograma, com indicação do encadeamento lógico e duração das etapas, melhor o desenvolvimento e o resultado do trabalho. É importante que o pesquisador leve em consideração no momento de elaboração do cronograma o tempo hábil para a realização de cada etapa e os recursos disponíveis.\n\nAvalie as afirmações a seguir e a relação proposta entre elas:\nI. O uso do cronograma de pesquisa é um recurso essencial para o planejamento das atividades do desenho experimental em relação ao tempo para execução delas.\nPORQUE\nII. O planejamento do tempo de execução das atividades de pesquisa atrapalha na gestão das etapas de realização do projeto de pesquisa, pois a realidade não obedece a esquemas.",
+    "q": "A respeito dessas afirmações, assinale a opção correta:",
+    "opts": [
+      "As afirmações I e II são proposições verdadeiras, e a II é uma justificativa correta da I.",
+      "As afirmações I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.",
+      "A afirmação I é uma proposição verdadeira, e a II é uma proposição falsa.",
+      "A afirmação I é uma proposição falsa, e a II é uma proposição verdadeira.",
+      "As afirmações I e II são proposições falsas."
+    ],
+    "ans": 2,
+    "explanation": "A asserção I é verdadeira, pois o cronograma é instrumento elementar de gestão e planejamento do tempo na pesquisa científica, permitindo controlar prazos e viabilidade. A asserção II é falsa, pois o planejamento não atrapalha a gestão; pelo contrário, é ele que viabiliza o monitoramento, ajustes necessários e conclusão tempestiva das etapas investigativas.",
+    "sources": [
+      "Angelina Aparecida de Aguiar Souza - Iniciação a Pesquisa Científica - Universidade São Francisco.pdf (Pág 3 - Pergunta 3)",
+      "Gabrielle - Iniciação a Pesquisa Científica - Unidade 4.pdf (Pág 2 - Pergunta 3)",
+      "Rosiane Cristina dos Santos - Iniciação a Pesquisa Científica - Universidade São Francisco.pdf (Pág 1 - Pergunta 1)",
+      "WhatsApp Image 2026-09-24 at 12.05.32 (1).jpeg"
+    ],
+    "n": 51
+  },
+  {
+    "code": "",
+    "tp": "Planejamento Metodológico (Finalidade do Cronograma de Pesquisa)",
+    "ctx": "O cronograma de projetos é uma ferramenta que descreve todas as tarefas que devem ser cumpridas para que o projeto seja entregue dentro do prazo determinado. (Disponível em: www.artia.com, Acesso em 15 jun. 2023).\n\nQual é a finalidade de um cronograma de pesquisa?\nI. Apresentar os resultados da pesquisa de forma visual.\nII. Definir as etapas e o tempo necessário para executar cada uma delas.\nIII. Indicar os recursos materiais e humanos disponíveis para a pesquisa.\nIV. Organizar os dados de autoria dos autores do trabalho.\nV. Mostrar as referências bibliográficas utilizadas no estudo.",
+    "q": "É correto o que se afirma apenas em:",
+    "opts": [
+      "I e IV.",
+      "III.",
+      "II e V.",
+      "V.",
+      "II."
+    ],
+    "ans": 4,
+    "explanation": "A finalidade precípua do cronograma de pesquisa é mapear as fases/etapas da investigação e estabelecer o período de tempo (meses, semanas ou quinzenas) necessário para cumprir cada uma. Apresentar dados é papel de gráficos e tabelas (I); recursos pertencem ao orçamento (III); dados de autoria ficam nos elementos pré-textuais (IV); e referências pertencem à seção de referências bibliográficas (V).",
+    "sources": [
+      "Angelina Aparecida de Aguiar Souza - Iniciação a Pesquisa Científica - Universidade São Francisco.pdf (Pág 4-5 - Pergunta 5)",
+      "Rosiane Cristina dos Santos - Iniciação a Pesquisa Científica - Universidade São Francisco.pdf (Pág 2 - Pergunta 2)",
+      "WhatsApp Image 2026-09-24 at 13.10.31.jpeg",
+      "WhatsApp Image 2026-09-25 at 15.48.59.jpeg"
+    ],
+    "n": 52
+  },
+  {
+    "code": "",
+    "tp": "Metodologia Científica (Dados Quantitativos vs. Dados Qualitativos)",
+    "ctx": "Na Coleta de Dados, possuímos métodos quantitativos e qualitativos. Em poucas palavras, podemos dizer que uma é mais focada na objetividade da pesquisa e outra na subjetividade. (Disponível em: https://luby.com.br/ciencia-de-dados/pesquisa-quantitativa-e-qualitativa/, Acesso em 15 jun. 2023).",
+    "q": "Qual é a principal diferença entre dados quantitativos e qualitativos?",
+    "opts": [
+      "Dados quantitativos são normalmente relacionados a características, percepção e opinião sobre algo, enquanto dados qualitativos são obtidos por meio de medições.",
+      "Dados quantitativos são agrupados em categorias a priori, enquanto dados qualitativos são categorizados empiricamente.",
+      "Dados quantitativos são obtidos por meio de entrevistas ou questionários, enquanto dados qualitativos são obtidos a partir de medições com equipamentos.",
+      "Dados quantitativos têm natureza numérica, enquanto dados qualitativos possuem natureza textual.",
+      "Dados quantitativos são obtidos por meio de análises qualitativas, enquanto dados qualitativos são obtidos por meio de análises quantitativas."
+    ],
+    "ans": 3,
+    "explanation": "A distinção epistemológica e prática fundamental é que dados quantitativos expressam grandezas mensuráveis traduzidas em números e métricas, submetidos a operações matemáticas e estatísticas; ao passo que dados qualitativos são de natureza descritiva, textual e conceitual, expressando significados, percepções, sentimentos e discursos.",
+    "sources": [
+      "- Iniciação a Pesquisa Científica -.pdf (Pág 3 - Pergunta 3)",
+      "Edineia Soares de Sousa - Iniciação a Pesquisa Científica - Universidade São Francisco.pdf4.pdf (Pág 5 - Pergunta 5)",
+      "Iniciacao_Pesquisa_Cientifica_Questionario_4.pdf (Pág 1 - Pergunta 1)",
+      "Iniciação a Pesquisa Científica 4.pdf (Pág 1 - Pergunta 4)",
+      "UNID4.pdf (Pág 4 - Pergunta 4)"
+    ],
+    "n": 53
+  }
+];
+
+let state = [];
+let currentFilter = 'all';
+
+// ── Construir Interface ──
+function buildQuiz() {
+  const container = document.getElementById('questions-container');
+  container.innerHTML = '';
+  state = Q.map(() => null);
+
+  const totalLabel = document.getElementById('q-total-label');
+  if (totalLabel) totalLabel.textContent = Q.length;
+
+  const resTotal = document.getElementById('res-total');
+  if (resTotal) resTotal.textContent = Q.length;
+
+  if (Q.length === 0) {
+    container.innerHTML = `
+      <div class="card" style="text-align: center; padding: 48px 24px;">
+        <div style="font-size: 40px; margin-bottom: 16px;">📑</div>
+        <h3 style="font-size: 20px; margin-bottom: 8px;">Aguardando Perguntas</h3>
+        <p style="color: var(--muted); font-size: 14px;">Envie as questões de Iniciação de Pesquisa Científica para que sejam adicionadas a este questionário.</p>
+      </div>
+    `;
+    updateCounters();
+    return;
+  }
+
+  Q.forEach((q, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.id = `card-${i}`;
+
+    let ctxHTML = '';
+    if (q.ctx) {
+      ctxHTML = `<div class="ctx-block">${q.ctx.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>')}</div>`;
+    }
+
+    const optsHTML = q.opts.map((opt, oi) => {
+      const letter = String.fromCharCode(65 + oi);
+      return `<button class="opt" data-qi="${i}" data-oi="${oi}" onclick="answer(${i},${oi})">
+        <span class="lt">${letter}</span>
+        <span>${escHtml(opt)}</span>
+      </button>`;
+    }).join('');
+
+    card.innerHTML = `
+      <div class="card-header">
+        <span class="q-num">Questão ${q.n || (i + 1)}</span>
+        <span class="q-topic">${q.tp || 'Pesquisa Científica'}</span>
+      </div>
+      ${ctxHTML}
+      <div class="q-text">${q.q.replace(/\n/g,'<br>')}</div>
+      <div class="opts" id="opts-${i}">${optsHTML}</div>
+      <div class="feedback" id="fb-${i}"></div>
+    `;
+
+    container.appendChild(card);
+  });
+
+  updateCounters();
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Responder ──
+function answer(qi, oi) {
+  if (state[qi] !== null) return;
+
+  const q = Q[qi];
+  const correct = oi === q.ans;
+  state[qi] = correct ? 'correct' : 'wrong';
+
+  const card = document.getElementById(`card-${qi}`);
+  const optsContainer = document.getElementById(`opts-${qi}`);
+  const fb = document.getElementById(`fb-${qi}`);
+  const buttons = optsContainer.querySelectorAll('.opt');
+
+  // Desabilita opções
+  buttons.forEach(b => b.disabled = true);
+
+  // Destaca a escolhida e a correta
+  buttons[oi].classList.add(correct ? 'correct' : 'wrong');
+  if (!correct) {
+    buttons[q.ans].classList.add('correct');
+  }
+
+  // Borda do Card
+  card.classList.add(correct ? 'answered-correct' : 'answered-wrong');
+
+  // Feedback explicativo
+  fb.classList.add('show');
+  if (correct) {
+    fb.classList.add('fb-correct');
+    fb.innerHTML = '✅ <strong>Parabéns! Resposta correta!</strong>' + (q.explanation ? `<br><span style="margin-top: 6px; display: inline-block;">${escHtml(q.explanation)}</span>` : '');
+  } else {
+    const chosenLetter = String.fromCharCode(65 + oi);
+    const correctLetter = String.fromCharCode(65 + q.ans);
+    fb.classList.add('fb-wrong');
+    fb.innerHTML = `❌ <strong>Incorreto.</strong> A alternativa ${chosenLetter}) está errada. A correta é <strong>${correctLetter}) ${escHtml(q.opts[q.ans])}</strong>${q.explanation ? ` — ${escHtml(q.explanation)}` : ''}`;
+  }
+
+  updateCounters();
+  checkFinished();
+  applyFilter(currentFilter);
+}
+
+// ── Contadores ──
+function updateCounters() {
+  const total = Q.length;
+  const answered = state.filter(s => s !== null).length;
+  const correct  = state.filter(s => s === 'correct').length;
+  const wrong    = state.filter(s => s === 'wrong').length;
+  const remain   = total - answered;
+  const pct      = total > 0 ? Math.round((answered / total) * 100) : 0;
+
+  document.getElementById('prog-text').textContent = `${answered} de ${total} respondidas`;
+  document.getElementById('prog-pct').textContent  = `${pct}%`;
+  document.getElementById('prog-bar').style.width  = `${pct}%`;
+  document.getElementById('cnt-c').textContent = correct;
+  document.getElementById('cnt-w').textContent = wrong;
+  document.getElementById('cnt-r').textContent = remain;
+}
+
+// ── Resultado Final ──
+function checkFinished() {
+  if (Q.length > 0 && state.every(s => s !== null)) {
+    setTimeout(() => {
+      const correct = state.filter(s => s === 'correct').length;
+      const wrong   = state.filter(s => s === 'wrong').length;
+      const pct     = Math.round((correct / Q.length) * 100);
+      let emoji = '😔', msg = 'Continue praticando! Você vai melhorar.';
+      if (pct >= 90) { emoji = '🏆'; msg = 'Excelente! Desempenho excepcional!'; }
+      else if (pct >= 75) { emoji = '🎉'; msg = 'Muito bem! Ótimo desempenho!'; }
+      else if (pct >= 60) { emoji = '👍'; msg = 'Bom trabalho! Mas há espaço para melhorar.'; }
+      else if (pct >= 40) { emoji = '📚'; msg = 'Revise os conteúdos e tente novamente.'; }
+
+      document.getElementById('res-emoji').textContent = emoji;
+      document.getElementById('res-pct').textContent   = `${pct}%`;
+      document.getElementById('res-msg').textContent   = msg;
+      document.getElementById('res-c').textContent     = correct;
+      document.getElementById('res-w').textContent     = wrong;
+
+      const rs = document.getElementById('result-screen');
+      rs.style.display = 'block';
+      rs.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 1200);
+  }
+}
+
+// ── Reset ──
+function resetQuiz() {
+  state = Q.map(() => null);
+  document.getElementById('result-screen').style.display = 'none';
+  buildQuiz();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  setFilter('all');
+}
+
+// ── Filtros ──
+function applyFilter(f) {
+  Q.forEach((_, i) => {
+    const card = document.getElementById(`card-${i}`);
+    if (!card) return;
+    let show = true;
+    if (f === 'unanswered') show = state[i] === null;
+    else if (f === 'correct')    show = state[i] === 'correct';
+    else if (f === 'wrong')      show = state[i] === 'wrong';
+    card.style.display = show ? '' : 'none';
+  });
+}
+
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.filter === f);
+  });
+  applyFilter(f);
+}
+
+document.querySelectorAll('.filter-btn').forEach(b => {
+  b.addEventListener('click', () => setFilter(b.dataset.filter));
+});
+
+// ── FAB ──
+window.addEventListener('scroll', () => {
+  document.getElementById('fab').classList.toggle('visible', window.scrollY > 400);
+});
+
+// ── Init ──
+buildQuiz();
+</script>
+</body>
+</html>

@@ -2,5 +2,11 @@
 !*/
 !deploy/
 !deploy/**
+!questionario-estatistica-pesquisa/
+!questionario-estatistica-pesquisa/**
+questionario-estatistica-pesquisa/*.bak
+questionario-estatistica-pesquisa/*.txt
+questionario-estatistica-pesquisa/temp_*
+questionario-interativo/
 !.gitignore
 !vercel.json
